@@ -2,12 +2,16 @@ import datetime
 from flask import url_for
 from bitnotes import db
 
-
-
-
 class BitBook(db.DynamicDocument):
 	bitnotes = db.ListField(db.GenericEmbeddedDocumentField())
 
+class User(db.Document):
+	email = db.EmailField(required=True, primary_key=True, help_text='Email is your ID')
+	#TODO
+	password = db.StringField(max_length=50, min_length=2)
+	bitbooks = db.ListField(db.ReferenceField(BitBook))
+
+	def is_authenticated(self):
 
 class BitNote(db.EmbeddedDocument):
     bitfields = db.ListField(db.GenericEmbeddedDocumentField())
