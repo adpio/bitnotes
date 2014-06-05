@@ -2,13 +2,22 @@ from flask import Blueprint, request, redirect, render_template, url_for
 from flask.views import MethodView
 
 from flask.ext.mongoengine.wtf import model_form
-from bitnotes.models import Post, Comment
+from bitnotes.models import Post, Comment, BitBook, BitNote
 
 posts = Blueprint('posts', __name__, template_folder='templates')
 
 
-class ListView(MethodView):
+class BitBookView(MethodView):
+    def get(self, id):
+        return BitBook.objects.get_or_404(id=id).to_json()
 
+class BitNoteView(MethodView):
+    def get(self, id):
+        note = BitNote.objects.get_or_404(id=id)
+        return render_template('notes/note.html', note=note)
+
+
+class ListView(MethodView):
     def get(self):
         posts = Post.objects.all()
         return render_template('posts/list.html', posts=posts)
@@ -51,3 +60,5 @@ class DetailView(MethodView):
 # Register the urls
 posts.add_url_rule('/', view_func=ListView.as_view('list'))
 posts.add_url_rule('/<slug>/', view_func=DetailView.as_view('detail'))
+posts.add_url_rule('/bb/<id>/', view_func=BitBookView.as_view('one'))
+posts.add_url_rule('/bn/<id>/',view_func=BitNoteView.as_view('note'))

@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% for field in note.bitfields %}
+	{% if field.bit_field_type == 'BlogPost' %}
+	{{ field.body}}<br/>
+	{% elif field.bit_field_type == 'Quote' %}
+	<quote>{{ field.body }}</quote><small>{{ field.author }}</small>
+	{% endif %}
+{% endfor %}
+{% endblock %}

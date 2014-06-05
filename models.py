@@ -3,7 +3,7 @@ from flask import url_for
 from bitnotes import db
 
 class BitBook(db.DynamicDocument):
-	bitnotes = db.ListField(db.GenericEmbeddedDocumentField())
+	bitnotes = db.ListField(db.GenericReferenceField())
 
 class User(db.Document):
 	email = db.EmailField(required=True, primary_key=True, help_text='Email is your ID')
@@ -11,9 +11,8 @@ class User(db.Document):
 	password = db.StringField(max_length=50, min_length=2)
 	bitbooks = db.ListField(db.ReferenceField(BitBook))
 
-	def is_authenticated(self):
 
-class BitNote(db.EmbeddedDocument):
+class BitNote(db.DynamicDocument):
     bitfields = db.ListField(db.GenericEmbeddedDocumentField())
     created_at = db.DateTimeField(default=datetime.datetime.now, required=True)
     meta = {'allow_inheritance':True}
@@ -31,7 +30,7 @@ class BitField(db.EmbeddedDocument):
 		return self.title
 
 	@property
-	def post_type(self):
+	def bit_field_type(self):
 		return self.__class__.__name__
 
 	meta = {
