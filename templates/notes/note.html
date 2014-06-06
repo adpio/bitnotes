@@ -1,11 +1,63 @@
 {% extends "base.html" %}
 
 {% block content %}
+<div class="row">
+<div class="col-md-8">
+<div class="panel panel-info">
+<div class="panel-body">
+
 {% for field in note.bitfields %}
+<form method="post" id="{{ field.title }}">
+	<input type="hidden" name="field_title" value="{{ field.title }}">
+	<input type="hidden" name="field_type" value="{{ field.bit_field_type }}">
 	{% if field.bit_field_type == 'BlogPost' %}
-	{{ field.body}}<br/>
+	<div class="form-group">
+	<label for="{{ field.title }}Text">{{ field.title }}</label>
+	<textarea rows="5" style="resize:vertical" id="{{ field.title }}Text" name="body" type="text" class="form-control">{{ field.body }}</textarea>
+	</div>
 	{% elif field.bit_field_type == 'Quote' %}
-	<quote>{{ field.body }}</quote><small>{{ field.author }}</small>
+	<div class="form-group">
+	<label for="{{ field.title }}Text">{{ field.title }}</label>
+	<textarea id="{{ field.title }}Text" style="resize:vertical" type="text" name="body" class="form-control">{{ field.body }}</textarea>
+	<label for="{{ field.title }}Author">By</label>
+	<input type="text" id="{{ field.title }}Author" type="text" class="form-control" name="author" value="{{ field.author }}">
+	</div>
+	{% elif field.bit_field_type == 'Code' %}
+	<div class="form-group">
+	<label for="{{ field.title }}">{{ field.title }}</label>
+	<code><pre>{{ field.body }}sa fkasjdhf to do:</pre></code>
+	</div>
+	{% elif field.bit_field_type == 'Image' %}
+	<div class="form-group">
+	<label for="{{ field.title }}Image">{{ field.title }}</label>
+	<input type="text" id="{{ field.title }}Image" type="text" class="form-control" value="{{ field.image_url }}">
+	<img src="{{ field.image_url }}" class="img-responsive" alt="Responsive image">
+	</div>
 	{% endif %}
+	<input type="submit" value="submit">
+</form>
 {% endfor %}
+
+</div>
+<div class="panel-footer">
+	Unused fields go here
+</div>
+</div>
+</div>
+<div class="col-md-4">
+	Add filed
+	<form method="post">
+		<input type="text" name="field_type" value="Quote">
+		<input type="text" name="field_title">
+		<input type="submit" class="btn" value="test">
+	</form>
+</div>
+</div>
+{% endblock %}
+{% block js_footer %}
+<script>
+	function submitForm(form_id) {
+    $.ajax({type:'POST', url: '', data:$('#'+form_id).serialize(), success: alert('hello')});
+}
+</script>
 {% endblock %}

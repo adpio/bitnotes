@@ -23,8 +23,6 @@ class Cover(BitNote):
 class BitField(db.EmbeddedDocument):
 	created_at = db.DateTimeField(default=datetime.datetime.now, required=True)
 	title = db.StringField(max_length=255, required=True)
-	def get_absolute_url(self):
-		return url_for('post', kwargs={"slug": self.slug})
 
 	def __unicode__(self):
 		return self.title
@@ -64,7 +62,10 @@ class Post(db.DynamicDocument):
 	}
 
 class BlogPost(BitField):
-	body = db.StringField(required=True)
+	body = db.StringField(required=False)
+
+class Code(BitField):
+	body = db.StringField(required=False)
 
 
 class Video(BitField):
@@ -72,12 +73,12 @@ class Video(BitField):
 
 
 class Image(BitField):
-	image_url = db.StringField(required=True, max_length=255)
+	image_url = db.StringField(required=False, max_length=255)
 
 
 class Quote(BitField):
-	body = db.StringField(required=True)
-	author = db.StringField(verbose_name="Author Name", required=True, max_length=255)
+	body = db.StringField(required=False)
+	author = db.StringField(verbose_name="Author Name", required=False, max_length=255)
 
 
 class Comment(db.EmbeddedDocument):
@@ -88,7 +89,7 @@ class Comment(db.EmbeddedDocument):
 #mocks
 BB = BitBook()
 BN1 = BitNote()
-Q = Quote(title='A quote', body='long body', author='Adam Piotrowski')
+Q = Quote(title='A quote', body='long body', author='Adam Piotrowski', embedded_in=BN1)
 BN1.bitfields.append(Q)
 P = BlogPost(title='post', body='long post of a sexy blog post')
 BN1.bitfields.append(P)

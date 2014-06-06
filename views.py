@@ -2,7 +2,7 @@ from flask import Blueprint, request, redirect, render_template, url_for
 from flask.views import MethodView
 
 from flask.ext.mongoengine.wtf import model_form
-from bitnotes.models import Post, Comment, BitBook, BitNote
+from bitnotes.models import Post, Comment, BitBook, BitNote, Quote, BlogPost, Code, Image
 
 posts = Blueprint('posts', __name__, template_folder='templates')
 
@@ -12,9 +12,41 @@ class BitBookView(MethodView):
         return BitBook.objects.get_or_404(id=id).to_json()
 
 class BitNoteView(MethodView):
-    def get(self, id):
-        note = BitNote.objects.get_or_404(id=id)
+    
+    def get(self, bitnote_id):
+        note = BitNote.objects.get_or_404(id=bitnote_id)
         return render_template('notes/note.html', note=note)
+
+    def post(self, bitnote_id):
+
+        note = BitNote.objects.get_or_404(id=bitnote_id)
+        field_type = request.form['field_type']
+        field_title = request.form['field_title']
+        field = [x for x in note.bitfields if x.title == field_title][0]
+        if field:
+            constructor = globals()[str(field_type)]
+            mform = model_form(constructor, exclude=['created_at','title'])
+            form = request.form
+            form.populate_obj(field)
+            field.save()
+        return render_template('notes/note.html', note=note)       
+
+
+
+
+    # def post(self, bitnote_id):
+    #     #TODO security
+    #     note = BitNote.objects.get_or_404(id=bitnote_id)
+    #     field_type = request.form['field_type']
+    #     field_title = request.form['field_title']
+    #     if not [x for x in note.bitfields if x.title == field_title]:
+    #         #constructing class from string:
+    #         constructor = globals()[field_type]
+    #         new_field = constructor(title=field_title)
+    #         #adding field to note:
+    #         note.bitfields.append(new_field)
+    #         note.save()
+    #     return render_template('notes/note.html', note=note)
 
 
 class ListView(MethodView):
@@ -61,4 +93,5 @@ class DetailView(MethodView):
 posts.add_url_rule('/', view_func=ListView.as_view('list'))
 posts.add_url_rule('/<slug>/', view_func=DetailView.as_view('detail'))
 posts.add_url_rule('/bb/<id>/', view_func=BitBookView.as_view('one'))
-posts.add_url_rule('/bn/<id>/',view_func=BitNoteView.as_view('note'))
+posts.add_url_rule('/bn/<bitnote_id>/',view_func=BitNoteView.as_view('bitnote'))
+
