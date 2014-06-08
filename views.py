@@ -24,29 +24,38 @@ class BitNoteView(MethodView):
         field_title = request.form['field_title']
         field = [x for x in note.bitfields if x.title == field_title][0]
         if field:
-            constructor = globals()[str(field_type)]
+            constructor = globals()[field_type]
             mform = model_form(constructor, exclude=['created_at','title'])
-            form = request.form
+            form = mform(request.form)
             form.populate_obj(field)
-            field.save()
+            note.save()
+
         return render_template('notes/note.html', note=note)       
 
 
+class FieldManager(MethodView):
+    def post(self, bitnote_id):
+        #TODO security
+        note = BitNote.objects.get_or_404(id=bitnote_id)
+        field_type = request.form['field_type']
+        field_title = request.form['field_title']
+        task = request.form['task']
 
+        if task == 'create':
+            if not [x for x in note.bitfields if x.title == field_title]:
+                #constructing class from string:
+                constructor = globals()[field_type]
+                new_field = constructor(title=field_title)
+                #adding field to note:
+                note.bitfields.append(new_field)
+                note.save()
 
-    # def post(self, bitnote_id):
-    #     #TODO security
-    #     note = BitNote.objects.get_or_404(id=bitnote_id)
-    #     field_type = request.form['field_type']
-    #     field_title = request.form['field_title']
-    #     if not [x for x in note.bitfields if x.title == field_title]:
-    #         #constructing class from string:
-    #         constructor = globals()[field_type]
-    #         new_field = constructor(title=field_title)
-    #         #adding field to note:
-    #         note.bitfields.append(new_field)
-    #         note.save()
-    #     return render_template('notes/note.html', note=note)
+        if task == 'delete':
+            note.update(pull__bitfields__title=field_title)
+            note.save()
+
+        return redirect(url_for('posts.bitnote', bitnote_id=note.id))
+
 
 
 class ListView(MethodView):
@@ -94,4 +103,5 @@ posts.add_url_rule('/', view_func=ListView.as_view('list'))
 posts.add_url_rule('/<slug>/', view_func=DetailView.as_view('detail'))
 posts.add_url_rule('/bb/<id>/', view_func=BitBookView.as_view('one'))
 posts.add_url_rule('/bn/<bitnote_id>/',view_func=BitNoteView.as_view('bitnote'))
+posts.add_url_rule('/bn/<bitnote_id>/field_manager',view_func=FieldManager.as_view('field_manager'))
 

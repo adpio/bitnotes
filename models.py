@@ -11,15 +11,6 @@ class User(db.Document):
 	password = db.StringField(max_length=50, min_length=2)
 	bitbooks = db.ListField(db.ReferenceField(BitBook))
 
-
-class BitNote(db.DynamicDocument):
-    bitfields = db.ListField(db.GenericEmbeddedDocumentField())
-    created_at = db.DateTimeField(default=datetime.datetime.now, required=True)
-    meta = {'allow_inheritance':True}
-
-class Cover(BitNote):
-	public = db.BooleanField(default=False,required=True)
-
 class BitField(db.EmbeddedDocument):
 	created_at = db.DateTimeField(default=datetime.datetime.now, required=True)
 	title = db.StringField(max_length=255, required=True)
@@ -37,7 +28,14 @@ class BitField(db.EmbeddedDocument):
 		'ordering': ['title']
 		}
 
+class BitNote(db.DynamicDocument):
+    bitfields = db.ListField(db.EmbeddedDocumentField(BitField))
+    created_at = db.DateTimeField(default=datetime.datetime.now, required=True)
+    meta = {'allow_inheritance':True}
 
+
+class Cover(BitNote):
+	public = db.BooleanField(default=False,required=True)
 
 class Post(db.DynamicDocument):
 	created_at = db.DateTimeField(default=datetime.datetime.now, required=True)
