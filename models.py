@@ -2,14 +2,11 @@ import datetime
 from flask import url_for
 from bitnotes import db
 
-class BitBook(db.DynamicDocument):
-	bitnotes = db.ListField(db.GenericReferenceField())
-
-class User(db.Document):
-	email = db.EmailField(required=True, primary_key=True, help_text='Email is your ID')
-	#TODO
-	password = db.StringField(max_length=50, min_length=2)
-	bitbooks = db.ListField(db.ReferenceField(BitBook))
+# class User(db.Document):
+# 	email = db.EmailField(required=True, primary_key=True, help_text='Email is your ID')
+# 	#TODO
+# 	password = db.StringField(max_length=50, min_length=2)
+# 	bitbooks = db.ListField(db.ReferenceField(BitBook))
 
 class BitField(db.EmbeddedDocument):
 	created_at = db.DateTimeField(default=datetime.datetime.now, required=True)
@@ -36,6 +33,14 @@ class BitNote(db.DynamicDocument):
 
 class Cover(BitNote):
 	public = db.BooleanField(default=False,required=True)
+
+class BitBook(db.DynamicDocument):
+	title = db.StringField(max_length=255, required=True)
+	description = db.StringField(required=False)
+	created_at = db.DateTimeField(default=datetime.datetime.now, required=True)
+	cover_fields = db.ListField(db.EmbeddedDocumentField(BitField))
+	bitnotes = db.ListField(db.GenericReferenceField())
+	thumbnail = db.ImageField(size=(800, 600, True), thumbnail_size=(150,150,True))
 
 class Post(db.DynamicDocument):
 	created_at = db.DateTimeField(default=datetime.datetime.now, required=True)

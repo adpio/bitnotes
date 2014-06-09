@@ -9,7 +9,8 @@ posts = Blueprint('posts', __name__, template_folder='templates')
 
 class BitBookView(MethodView):
     def get(self, id):
-        return BitBook.objects.get_or_404(id=id).to_json()
+        bitbook = BitBook.objects.get_or_404(id=id)
+        return render_template('bitbook.html', bitbook=bitbook)
 
 class BitNoteView(MethodView):
     
@@ -49,12 +50,14 @@ class FieldManager(MethodView):
                 #adding field to note:
                 note.bitfields.append(new_field)
                 note.save()
+                if bitbook:
+                    bitbook.update(add_to_set__cover_fields = '')
 
         if task == 'delete':
             note.update(pull__bitfields__title=field_title)
             note.save()
 
-        return redirect(url_for('posts.bitnote', bitnote_id=note.id))
+        return redirect(url_for('posts.bitnote', bitnote_id = note.id))
 
 
 
@@ -104,4 +107,5 @@ posts.add_url_rule('/<slug>/', view_func=DetailView.as_view('detail'))
 posts.add_url_rule('/bb/<id>/', view_func=BitBookView.as_view('one'))
 posts.add_url_rule('/bn/<bitnote_id>/',view_func=BitNoteView.as_view('bitnote'))
 posts.add_url_rule('/bn/<bitnote_id>/field_manager',view_func=FieldManager.as_view('field_manager'))
+
 
