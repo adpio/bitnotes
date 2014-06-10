@@ -38,9 +38,10 @@ class BitBook(db.DynamicDocument):
 	title = db.StringField(max_length=255, required=True)
 	description = db.StringField(required=False)
 	created_at = db.DateTimeField(default=datetime.datetime.now, required=True)
-	cover_fields = db.ListField(db.EmbeddedDocumentField(BitField))
+	cover_fields = db.DictField(required=False)
 	bitnotes = db.ListField(db.GenericReferenceField())
 	thumbnail = db.ImageField(size=(800, 600, True), thumbnail_size=(150,150,True))
+
 
 class Post(db.DynamicDocument):
 	created_at = db.DateTimeField(default=datetime.datetime.now, required=True)

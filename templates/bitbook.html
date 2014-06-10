@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 
+{{ bitbook.to_json() }}
 {% for field in bitbook.cover_fields %}
 
 {% endfor %}

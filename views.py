@@ -6,6 +6,20 @@ from bitnotes.models import Post, Comment, BitBook, BitNote, Quote, BlogPost, Co
 
 posts = Blueprint('posts', __name__, template_folder='templates')
 
+class BitBookShelf(MethodView):
+
+    form = model_form(BitBook, exclude=['created_at','cover_fields','bitnotes'])(request.form)
+
+    def get(self):
+        bitbooks = BitBook.objects.all()
+        return render_template('bookshelf.html', bitbooks=bitbooks, form=form)
+
+    def post(self):
+        b = BitBook()
+        form.populate_obj(b)
+        b.save()
+        return render_template('bitbook.html', bitbook=b)
+
 
 class BitBookView(MethodView):
     def get(self, id):
@@ -41,7 +55,7 @@ class FieldManager(MethodView):
         field_type = request.form['field_type']
         field_title = request.form['field_title']
         task = request.form['task']
-
+        bitbook = None
         if task == 'create':
             if not [x for x in note.bitfields if x.title == field_title]:
                 #constructing class from string:
@@ -50,8 +64,10 @@ class FieldManager(MethodView):
                 #adding field to note:
                 note.bitfields.append(new_field)
                 note.save()
-                if bitbook:
-                    bitbook.update(add_to_set__cover_fields = '')
+                if bitbook and field_title not in bitbook.cover_fields:
+                    bitbook.cover_fields[field_title] = new_field
+                    bitbook.save()
+                    
 
         if task == 'delete':
             note.update(pull__bitfields__title=field_title)
@@ -107,5 +123,6 @@ posts.add_url_rule('/<slug>/', view_func=DetailView.as_view('detail'))
 posts.add_url_rule('/bb/<id>/', view_func=BitBookView.as_view('one'))
 posts.add_url_rule('/bn/<bitnote_id>/',view_func=BitNoteView.as_view('bitnote'))
 posts.add_url_rule('/bn/<bitnote_id>/field_manager',view_func=FieldManager.as_view('field_manager'))
+posts.add_url_rule('/bb/', view_func=BitBookShelf.as_view('bitbooks'))
 
 
