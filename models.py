@@ -30,6 +30,14 @@ class BitNote(db.DynamicDocument):
     created_at = db.DateTimeField(default=datetime.datetime.now, required=True)
     meta = {'allow_inheritance':True}
 
+    def save_to_bitbook(self, bitbook):
+    	bitbook.bitnotes.append(self)
+    	for field in self.bitfields:
+    		if field.title not in bitbook.cover_fields:
+    			bitbook.cover_fields[field.title] = field
+    	bitbook.save()
+
+
 
 class Cover(BitNote):
 	public = db.BooleanField(default=False,required=True)
@@ -41,7 +49,7 @@ class BitBook(db.DynamicDocument):
 	cover_fields = db.DictField(required=False)
 	bitnotes = db.ListField(db.GenericReferenceField())
 	thumbnail = db.ImageField(size=(800, 600, True), thumbnail_size=(150,150,True))
-	filex = db.FileField()
+
 
 
 class Post(db.DynamicDocument):

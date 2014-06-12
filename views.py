@@ -36,6 +36,8 @@ class BitBookView(MethodView):
     def get(self, id):
         bitbook = BitBook.objects.get_or_404(id=id)
         return render_template('bitbook.html', bitbook=bitbook)
+    def post(self):
+        pass
 
 class BitNoteView(MethodView):
     
