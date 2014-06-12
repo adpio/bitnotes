@@ -8,17 +8,28 @@ posts = Blueprint('posts', __name__, template_folder='templates')
 
 class BitBookShelf(MethodView):
 
-    form = model_form(BitBook, exclude=['created_at','cover_fields','bitnotes'])(request.form)
+    form = model_form(BitBook, exclude=['created_at','cover_fields','bitnotes'])
+
+    def get_context(self):
+        context = {
+            'form': self.form(request.form),
+            'bitbooks': BitBook.objects.all(),
+        }
+        return context
 
     def get(self):
-        bitbooks = BitBook.objects.all()
-        return render_template('bookshelf.html', bitbooks=bitbooks, form=form)
+        context = self.get_context()
+        return render_template('bookshelf.html', **context)
 
     def post(self):
-        b = BitBook()
-        form.populate_obj(b)
-        b.save()
-        return render_template('bitbook.html', bitbook=b)
+        context = self.get_context()
+        form = context.get('form')
+        if form.validate():
+            b = BitBook()
+            form.populate_obj(b)
+            b.save()
+            return redirect(url_for('posts.one', id=b.id))
+        return render_template('bookshelf.html', **context)
 
 
 class BitBookView(MethodView):

@@ -41,6 +41,7 @@ class BitBook(db.DynamicDocument):
 	cover_fields = db.DictField(required=False)
 	bitnotes = db.ListField(db.GenericReferenceField())
 	thumbnail = db.ImageField(size=(800, 600, True), thumbnail_size=(150,150,True))
+	filex = db.FileField()
 
 
 class Post(db.DynamicDocument):
