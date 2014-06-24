@@ -20,22 +20,22 @@ class BitField(db.EmbeddedDocument):
 		return self.__class__.__name__
 
 	meta = {
-	    'allow_inheritance': True,
+		'allow_inheritance': True,
 		'indexes': ['-created_at', 'title'],
 		'ordering': ['title']
 		}
 
 class BitNote(db.DynamicDocument):
-    bitfields = db.ListField(db.EmbeddedDocumentField(BitField))
-    created_at = db.DateTimeField(default=datetime.datetime.now, required=True)
-    meta = {'allow_inheritance':True}
+	bitfields = db.ListField(db.EmbeddedDocumentField(BitField))
+	created_at = db.DateTimeField(default=datetime.datetime.now, required=True)
+	meta = {'allow_inheritance':True}
 
-    def save_to_bitbook(self, bitbook):
-    	bitbook.bitnotes.append(self)
-    	for field in self.bitfields:
-    		if field.title not in bitbook.cover_fields:
-    			bitbook.cover_fields[field.title] = field
-    	bitbook.save()
+	def save_to_bitbook(self, bitbook):
+		bitbook.bitnotes.append(self)
+		for field in self.bitfields:
+			if field.title not in bitbook.cover_fields:
+				bitbook.cover_fields[field.title] = field
+		bitbook.save()
 
 
 
@@ -59,19 +59,19 @@ class Post(db.DynamicDocument):
 	comments = db.ListField(db.EmbeddedDocumentField('Comment'))
 
 	def get_absolute_url(self):
-	    return url_for('post', kwargs={"slug": self.slug})
+		return url_for('post', kwargs={"slug": self.slug})
 
 	def __unicode__(self):
-	    return self.title
+		return self.title
 
 	@property
 	def post_type(self):
-	    return self.__class__.__name__
+		return self.__class__.__name__
 
 	meta = {
-	    'allow_inheritance': True,
-	    'indexes': ['-created_at', 'slug'],
-	    'ordering': ['-created_at']
+		'allow_inheritance': True,
+		'indexes': ['-created_at', 'slug'],
+		'ordering': ['-created_at']
 	}
 
 class BlogPost(BitField):
@@ -79,6 +79,17 @@ class BlogPost(BitField):
 
 class Code(BitField):
 	body = db.StringField(required=False)
+
+class Rating(BitField):
+	rating_scale = db.IntField(default=0)
+	rating_value = db.IntField(default=0)
+
+	@property
+	def rating(self):
+		if rating_count > 0:
+			return self.rating_value/self.rating_scale
+		else:
+			return 0
 
 
 class Video(BitField):

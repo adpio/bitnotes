@@ -11,6 +11,7 @@
 
 {% for book in bitbooks %}
 {{ book.to_json() }}
+<a href="{{ url_for('posts.bitbook', bitbook_id=book.id) }}">click</a>
 <br/>
 {% endfor %}
 {% endblock %}

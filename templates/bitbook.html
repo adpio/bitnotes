@@ -1,7 +1,17 @@
 {% extends "base.html" %}
 {% block content %}
+<form method="post" action="note_manager">
+	<input type="hidden" name="action" value="create">
+
+	<input type="submit" class="btn" value="create">
+</form>
 
 {{ bitbook.to_json() }}
+<ul>
+{% for note in bitbook.bitnotes %}
+<li>{{ note.created_at }} <a href="{{ url_for('posts.bitnote', bitbook_id=bitbook.id, bitnote_id=note.id ) }}">link</a></li>
+{% endfor %}
+</ul>
 {% for field in bitbook.cover_fields %}
 
 {% endfor %}
