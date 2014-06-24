@@ -81,7 +81,7 @@ class Code(BitField):
 	body = db.StringField(required=False)
 
 class Rating(BitField):
-	rating_scale = db.IntField(default=0)
+	rating_scale = db.IntField(default=5)
 	rating_value = db.IntField(default=0)
 
 	@property
