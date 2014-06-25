@@ -61,6 +61,22 @@
 		submitForm('{{ field.__hash__() }}');
 	})
 	</script>
+	{% elif field.bit_field_type == 'CommentBox' %}
+		<div class="form-group">
+		<label class="col-sm-2 control-label" for="{{ field.title }}CommentBox">{{ field.title }}</label>
+		<div class="col-sm-10">
+			{% for comment in  field.comments %}
+			<quote>{{ comment.body }}</quote><br />
+			<small><label>By: </label>{{ comment.author }}</small><br />
+			<hr>
+			{% endfor %}
+			<label class="col-sm-2 control-label" for="{{ field.title }}CommentBody">Body</label>
+			<input type="text" name="body" id="{{ field.title }}CommentBody" class="form-control">
+			<label class="col-sm-2 control-label" for="{{ field.title }}CommentAuthor">Author</label>
+			<input type="text" name="author" id="{{ field.title }}CommentAuthor" class="form-control">
+			<input type="submit" class="btn btn-primary" value="Submit Comment">
+		</div>
+		</div>
 	{% endif %}
 </form>
 <form method="post" action="field_manager">
@@ -69,11 +85,14 @@
 		<input type="hidden" name="field_type" value="{{ field.bit_field_type }}">
 		<input type="submit" class="btn" value="delete field">
 </form>
-<script>
-$('#{{ field.__hash__() }}').keypress(function(){
-	submitForm('{{ field.__hash__() }}');
-})
-</script>
+	{% if field.bit_field_type in ['BlogPost', 'Image', 'Quote'] %}
+		<script>
+
+		$('#{{ field.__hash__() }}').keypress(function(){
+			submitForm('{{ field.__hash__() }}');
+		})
+		</script>
+	{% endif %}
 {% endfor %}
 
 </div>

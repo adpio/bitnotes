@@ -2,7 +2,7 @@ from flask import Blueprint, request, redirect, render_template, url_for
 from flask.views import MethodView
 
 from flask.ext.mongoengine.wtf import model_form
-from bitnotes.models import Post, Comment, BitBook, BitNote, Quote, BlogPost, Code, Image, Rating
+from bitnotes.models import *
 
 posts = Blueprint('posts', __name__, template_folder='templates')
 
@@ -59,10 +59,16 @@ class BitNoteView(MethodView):
         field_title = request.form['field_title']
         field = [x for x in note.bitfields if x.title == field_title][0]
         if field:
-            constructor = globals()[field_type]
-            mform = model_form(constructor, exclude=['created_at','title'])
-            form = mform(request.form)
-            form.populate_obj(field)
+            if field_type == 'CommentBox':
+                body = request.form['body']
+                author = request.form['author']
+                c = Comment(body=body, author=author)
+                field.comments.append(c)
+            else:
+                constructor = globals()[field_type]
+                mform = model_form(constructor, exclude=['created_at','title'])
+                form = mform(request.form)
+                form.populate_obj(field)
             note.save()
 
         return render_template('notes/note.html', note=note)       
@@ -104,6 +110,11 @@ class FieldManager(MethodView):
         if task == 'delete':
             note.update(pull__bitfields__title=field_title)
             note.save()
+            # if not BitBook.objects(id=bitbook.id, bitnotes__bitfields__title=field_title):
+            #     del bitbook.cover_fields[field_title]
+            #     bitbook.save()
+
+
 
         if task == 'update':
             if (not[ x for x in note.bitfields if x.title == field_title]) and (field_title in bitbook.cover_fields):
