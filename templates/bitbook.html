@@ -3,15 +3,24 @@
 <form method="post" action="note_manager">
 	<input type="hidden" name="action" value="create">
 
-	<input type="submit" class="btn" value="create">
+	<input type="submit" class="btn" value="+">
 </form>
-
-{{ bitbook.to_json() }}
-<ul>
-{% for note in bitbook.bitnotes %}
-<li>{{ note.created_at }} <a href="{{ url_for('posts.bitnote', bitbook_id=bitbook.id, bitnote_id=note.id ) }}">link</a></li>
+<div class="row">
+<h1>{{ bitbook.title }} <span class="label label-success">{{ bitbook.bitnotes|count }}</span></h1>
+<p>{{ bitbook.description }}</p>
+{% for field in bitbook.cover_fields %}
+<span class="label label-primary">{{ field }}</span>
 {% endfor %}
-</ul>
+</div>
+
+<div class="list-group">
+{% for note in bitbook.bitnotes %}
+  <a href="{{ url_for('posts.bitnote', bitbook_id=bitbook.id, bitnote_id=note.id ) }}" class="list-group-item">
+    <h4 class="list-group-item-heading">{{ note.created_at.strftime('%Y %m %d (%H:%M)') }}</h4>
+    <p class="list-group-item-text">some bitnote description will go here once it's effing ready!</p>
+  </a>
+{% endfor %}
+</div>
 {% for field in bitbook.cover_fields %}
 
 {% endfor %}

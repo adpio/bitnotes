@@ -4,3 +4,5 @@ WTForms
 mongoengine
 flask_mongoengine
 flask-login
+flask-security
+flask-mail

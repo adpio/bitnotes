@@ -1,12 +1,24 @@
 import datetime
 from flask import url_for
 from bitnotes import db
+from flask.ext.security import UserMixin, RoleMixin, MongoEngineUserDatastore
 
-# class User(db.Document):
-# 	email = db.EmailField(required=True, primary_key=True, help_text='Email is your ID')
-# 	#TODO
-# 	password = db.StringField(max_length=50, min_length=2)
-# 	bitbooks = db.ListField(db.ReferenceField(BitBook))
+
+
+class Role(db.Document, RoleMixin):
+    name = db.StringField(max_length=80, unique=True)
+    description = db.StringField(max_length=255)
+
+class User(db.Document, UserMixin):
+    email = db.StringField(max_length=255)
+    password = db.StringField(max_length=255)
+    active = db.BooleanField(default=True)
+    confirmed_at = db.DateTimeField()
+    roles = db.ListField(db.ReferenceField(Role), default=[])
+    bitbooks = db.ListField(db.ReferenceField('BitBook'))
+
+user_datastore = MongoEngineUserDatastore(db, User, Role)
+
 
 class BitField(db.EmbeddedDocument):
 	created_at = db.DateTimeField(default=datetime.datetime.now, required=True)
@@ -49,27 +61,27 @@ class BitBook(db.DynamicDocument):
 
 
 
-class Post(db.DynamicDocument):
-	created_at = db.DateTimeField(default=datetime.datetime.now, required=True)
-	title = db.StringField(max_length=255, required=True)
-	slug = db.StringField(max_length=255, required=True)
-	comments = db.ListField(db.EmbeddedDocumentField('Comment'))
+# class Post(db.DynamicDocument):
+# 	created_at = db.DateTimeField(default=datetime.datetime.now, required=True)
+# 	title = db.StringField(max_length=255, required=True)
+# 	slug = db.StringField(max_length=255, required=True)
+# 	comments = db.ListField(db.EmbeddedDocumentField('Comment'))
 
-	def get_absolute_url(self):
-		return url_for('post', kwargs={"slug": self.slug})
+# 	def get_absolute_url(self):
+# 		return url_for('post', kwargs={"slug": self.slug})
 
-	def __unicode__(self):
-		return self.title
+# 	def __unicode__(self):
+# 		return self.title
 
-	@property
-	def post_type(self):
-		return self.__class__.__name__
+# 	@property
+# 	def post_type(self):
+# 		return self.__class__.__name__
 
-	meta = {
-		'allow_inheritance': True,
-		'indexes': ['-created_at', 'slug'],
-		'ordering': ['-created_at']
-	}
+# 	meta = {
+# 		'allow_inheritance': True,
+# 		'indexes': ['-created_at', 'slug'],
+# 		'ordering': ['-created_at']
+# 	}
 
 class BlogPost(BitField):
 	body = db.StringField(required=False)
@@ -103,12 +115,14 @@ class Quote(BitField):
 
 class Comment(db.EmbeddedDocument):
 	body = db.StringField(verbose_name="Comment", required=True)
-	author = db.StringField(verbose_name="Name", max_length=255, required=True)
+	author = db.ReferenceField('User')
 
 class CommentBox(BitField):
 	comments = db.ListField(db.EmbeddedDocumentField('Comment'))
 	def __unicode__(self):
-		return 'CB%s'%(self.title)
+		return self.title
+
+
 
 
 
@@ -118,6 +132,16 @@ BN1 = BitNote()
 Q = Quote(title='A quote', body='long body', author='Adam Piotrowski', embedded_in=BN1)
 BN1.bitfields.append(Q)
 P = BlogPost(title='post', body='long post of a sexy blog post')
+#C = Comment(body='asdasd', author=User.objects.all()[0])
+CB = CommentBox(title='commentbox')
+#CB.comments.append(C)
 BN1.bitfields.append(P)
+BN1.bitfields.append(CB)
+
+
+def clean_all_shit():
+	BitNote.objects.all().delete()
+	BitBook.objects.all().delete()
+	print 'ok'
 
 

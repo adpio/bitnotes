@@ -7,7 +7,8 @@
 {% block content %}
 <div class="row">
 <div class="col-md-8">
-<div class="panel panel-info">
+<div class="panel panel-primary">
+<div class="panel-heading">delete / send-to / add-owner / show-to</div>
 <div class="panel-body">
 
 {% for field in note.bitfields %}
@@ -67,13 +68,11 @@
 		<div class="col-sm-10">
 			{% for comment in  field.comments %}
 			<quote>{{ comment.body }}</quote><br />
-			<small><label>By: </label>{{ comment.author }}</small><br />
+			<small><label>By: </label>{{ comment.author.email }}</small><br />
 			<hr>
 			{% endfor %}
 			<label class="col-sm-2 control-label" for="{{ field.title }}CommentBody">Body</label>
 			<input type="text" name="body" id="{{ field.title }}CommentBody" class="form-control">
-			<label class="col-sm-2 control-label" for="{{ field.title }}CommentAuthor">Author</label>
-			<input type="text" name="author" id="{{ field.title }}CommentAuthor" class="form-control">
 			<input type="submit" class="btn btn-primary" value="Submit Comment">
 		</div>
 		</div>
@@ -97,25 +96,32 @@
 
 </div>
 <div class="panel-footer">
+Unused fields:
 	{% for field in unused_bitfields %}
-		<form method="post" action="field_manager">
+		<form method="post" action="field_manager" style="display:inline">
 				<input type="hidden" name="task" value="update">
 				<input type="hidden" name="field_title" value="{{ field.title }}">
 				<input type="hidden" name="field_type" value="{{ field.bit_field_type }}">
-				<input type="submit" class="btn" value="{{ field.title }}">
+				<input type="submit" class="btn btn-xs btn-primary" value="{{ field.title }}">
 		</form>
 	{% endfor %}
 </div>
 </div>
 </div>
 <div class="col-md-4">
-	Add filed
-	<form method="post" action="field_manager">
-		<input type="hidden" name="task" value="create">
-		<input type="text" name="field_type" value="Quote">
-		<input type="text" name="field_title">
-		<input type="submit" class="btn" value="test">
-	</form>
+Add filed
+<form method="post" action="field_manager">
+<input type="hidden" name="task" value="create">
+<div class="radio"><label><input type="radio" name="field_type"value="BlogPost" checked>Blog Post</label></div>
+<div class="radio"><label><input type="radio" name="field_type"value="Rating" checked>Rating</label></div>
+<div class="radio"><label><input type="radio" name="field_type"value="Quote" checked>Quote</label></div>
+<div class="radio"><label><input type="radio" name="field_type"value="CommentBox" checked>Comments</label></div>
+<div class="radio"><label><input type="radio" name="field_type"value="Image" checked>Image</label></div>
+<div class="radio"><label><input type="radio" name="field_type"value="Code" checked>Code</label></div>
+<div class="radio"><label><input type="radio" name="field_type"value="Video" checked>Video</label></div>
+<input type="text" name="field_title" placeholder="enter unique field title">
+<input type="submit" class="btn" value="test">
+</form>
 </div>
 </div>
 {% endblock %}

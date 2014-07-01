@@ -1,17 +1,45 @@
 {% extends "base.html" %}
 {% import "_forms2.html" as forms %}
-{% block content %}
+{% block extra_head %}
+<style type="text/css">
+.caption p{
+	line-height:1.2em; 
+	height:3.6em;
+	overflow:hidden;
+}
+.caption h3{
+	line-height:1.2em; 
+	height:1.2em;
+	overflow:hidden;
+}
 
-  <form action="" method="post" enctype="multipart/form-data">
-    {{ forms.render(form) }}
-    <div class="actions">
-      <input type="submit" class="btn btn-primary" value="save">
-    </div>
-  </form>
+</style>
+{% endblock %}
+{% block content %}
+<div class="row">
+<form action="" method="post" enctype="multipart/form-data">
+{{ forms.render(form) }}
+<div class="actions">
+<input type="submit" class="btn btn-primary" value="save">
+</div>
+</form>
+{{ current_user.email }}
+</div>
 
 {% for book in bitbooks %}
-{{ book.to_json() }}
-<a href="{{ url_for('posts.bitbook', bitbook_id=book.id) }}">click</a>
-<br/>
+
+
+  <div style="margin-bottom:2em;" class="col-sm-4 col-md-3">
+    <div class="thumbnail">
+      <div class="caption">
+        <h3>{{ book.title }}</h3>
+        <p>{{ book.description }}</p>
+        <p><a href="{{ url_for('posts.bitbook', bitbook_id=book.id) }}" class="btn btn-primary" role="button">Open</a></p>
+      </div>
+    </div>
+  </div>
+
+
+
 {% endfor %}
 {% endblock %}

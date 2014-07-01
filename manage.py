@@ -4,6 +4,10 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from flask.ext.script import Manager, Server
 from bitnotes import app
+# from models import user_datastore
+# from flask.ext.security import Security
+
+# security = Security(app, user_datastore)
 
 manager = Manager(app)
 

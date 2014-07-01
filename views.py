@@ -3,31 +3,41 @@ from flask.views import MethodView
 
 from flask.ext.mongoengine.wtf import model_form
 from bitnotes.models import *
+from flask.ext.security import login_required
+from flask_login import current_user
 
 posts = Blueprint('posts', __name__, template_folder='templates')
+
 
 class BitBookShelf(MethodView):
 
     form = model_form(BitBook, exclude=['created_at','cover_fields','bitnotes'])
 
     def get_context(self):
+        user = User.objects.get_or_404(id=current_user.id)
         context = {
             'form': self.form(request.form),
-            'bitbooks': BitBook.objects.all(),
+            'bitbooks': user.bitbooks,
+            'user' : user,
         }
         return context
 
+    @login_required
     def get(self):
         context = self.get_context()
         return render_template('bookshelf.html', **context)
 
+    @login_required
     def post(self):
         context = self.get_context()
         form = context.get('form')
+        user = context.get('user')
         if form.validate():
             b = BitBook()
             form.populate_obj(b)
             b.save()
+            user.bitbooks.append(b)
+            user.save()
             return redirect(url_for('posts.bitbook', bitbook_id=b.id))
         return render_template('bookshelf.html', **context)
 
@@ -53,6 +63,7 @@ class BitNoteView(MethodView):
         unused_bitfields = unused_bitfields.values()
         return render_template('notes/note.html', note=note, bitbook=bitbook, unused_bitfields=unused_bitfields)
 
+    @login_required
     def post(self, bitbook_id, bitnote_id):
         note = BitNote.objects.get_or_404(id=bitnote_id)
         field_type = request.form['field_type']
@@ -61,9 +72,11 @@ class BitNoteView(MethodView):
         if field:
             if field_type == 'CommentBox':
                 body = request.form['body']
-                author = request.form['author']
+                author = User.objects.get_or_404(id=current_user.id)
+                #author = User().save()
                 c = Comment(body=body, author=author)
                 field.comments.append(c)
+
             else:
                 constructor = globals()[field_type]
                 mform = model_form(constructor, exclude=['created_at','title'])
