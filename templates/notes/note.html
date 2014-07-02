@@ -1,135 +1,144 @@
 {% extends "base.html" %}
 
 {% block extra_head %}
-	<script src="http://rawgit.com/javiertoledo/bootstrap-rating-input/master/build/bootstrap-rating-input.min.js"></script>
+<script src="http://rawgit.com/javiertoledo/bootstrap-rating-input/master/build/bootstrap-rating-input.min.js"></script>
 {% endblock %}
 
 {% block content %}
 <div class="row">
-<div class="col-md-8">
-<div class="panel panel-primary">
-<div class="panel-heading">delete / send-to / add-owner / show-to</div>
-<div class="panel-body">
+	<div class="col-md-8">
+		<div class="panel panel-primary">
+			<div class="panel-heading">delete / send-to / add-owner / show-to</div>
+			<div class="panel-body">
 
-{% for field in note.bitfields %}
-<form class="form-horizontal" role="form" method="post" id="{{ field.__hash__() }}">
-	<input type="hidden" name="field_title" value="{{ field.title }}">
-	<input type="hidden" name="field_type" value="{{ field.bit_field_type }}">
+				{% for field in note.bitfields %}
+				<form class="form-horizontal" role="form" method="post" id="{{ field.__hash__() }}">
+					<input type="hidden" name="field_title" value="{{ field.title }}">
+					<input type="hidden" name="field_type" value="{{ field.bit_field_type }}">
 
-	{% if field.bit_field_type == 'BlogPost' %}
-	<div class="form-group">
-	<label class="col-sm-2 control-label" for="{{ field.title }}Text">{{ field.title }}</label>
-	<div class="col-sm-10">
-	<textarea rows="5" style="resize:vertical" id="{{ field.title }}Text" name="body" type="text" class="form-control">{{ field.body }}</textarea>
-	</div>
-	</div>
-	{% elif field.bit_field_type == 'Quote' %}
-	<div class="form-group">
-	<label class="col-sm-2 control-label" for="{{ field.title }}Text">{{ field.title }}</label>
-	<div class="col-sm-10">
-	<textarea id="{{ field.title }}Text" style="resize:vertical" type="text" name="body" class="form-control">{{ field.body }}</textarea>
-	</div>
-	<label class="col-sm-2 control-label" for="{{ field.title }}Author">By</label>
-	<div class="col-sm-10">
-	<input type="text" id="{{ field.title }}Author" type="text" class="form-control" name="author" value="{{ field.author }}">
-	</div>
-	</div>
-	{% elif field.bit_field_type == 'Code' %}
-	<div class="form-group">
-	<label class="col-sm-2 control-label" for="{{ field.title }}">{{ field.title }}</label>
-	<div class="col-sm-10">
-	<code><pre>{{ field.body }}sa fkasjdhf to do:</pre></code>
-	</div>
-	</div>
-	{% elif field.bit_field_type == 'Image' %}
-	<div class="form-group">
-	<label class="col-sm-2 control-label" for="{{ field.title }}Image">{{ field.title }}</label>
-	<div class="col-sm-10">
-	<input type="text" id="{{ field.title }}Image" type="text" class="form-control" name="image_url" value="{{ field.image_url }}">
-	<img src="{{ field.image_url }}" class="img-responsive" alt="Responsive image">
-	</div>
-	</div>
-	{% elif field.bit_field_type == 'Rating' %}
-	<div class="form-group">
-	<label class="col-sm-2 control-label" for="{{ field.title }}Rating">{{ field.title }}</label>
-	<div class="col-sm-10">
-	<input class="rating" data-max="5" data-min="1" id="{{ field.__hash__() }}Rating" name="rating_value" type="number" value="{{ field.rating_value }}" />
-	<input type="hidden" name="rating_scale" value="{{ field.rating_scale }}">
-	</div>
-	</div>
-	<script>
-	$("#{{ field.__hash__() }}Rating").change(function(){
-		submitForm('{{ field.__hash__() }}');
-	})
-	</script>
-	{% elif field.bit_field_type == 'CommentBox' %}
-		<div class="form-group">
-		<label class="col-sm-2 control-label" for="{{ field.title }}CommentBox">{{ field.title }}</label>
-		<div class="col-sm-10">
-			{% for comment in  field.comments %}
-			<quote>{{ comment.body }}</quote><br />
-			<small><label>By: </label>{{ comment.author.email }}</small><br />
-			<hr>
-			{% endfor %}
-			<label class="col-sm-2 control-label" for="{{ field.title }}CommentBody">Body</label>
-			<input type="text" name="body" id="{{ field.title }}CommentBody" class="form-control">
-			<input type="submit" class="btn btn-primary" value="Submit Comment">
+					{% if field.bit_field_type == 'BlogPost' %}
+					<div class="form-group">
+						<label class="col-sm-2 control-label" for="{{ field.title }}Text">{{ field.title }}</label>
+						<div class="col-sm-10">
+							<textarea rows="5" style="resize:vertical" id="{{ field.title }}Text" name="body" type="text" class="form-control">{{ field.body }}</textarea>
+						</div>
+					</div>
+					{% elif field.bit_field_type == 'Quote' %}
+					<div class="form-group">
+						<label class="col-sm-2 control-label" for="{{ field.title }}Text">{{ field.title }}</label>
+						<div class="col-sm-10">
+							<textarea id="{{ field.title }}Text" style="resize:vertical" type="text" name="body" class="form-control">{{ field.body }}</textarea>
+						</div>
+						<label class="col-sm-2 control-label" for="{{ field.title }}Author">By</label>
+						<div class="col-sm-10">
+							<input type="text" id="{{ field.title }}Author" type="text" class="form-control" name="author" value="{{ field.author }}">
+						</div>
+					</div>
+					{% elif field.bit_field_type == 'Code' %}
+					<div class="form-group">
+						<label class="col-sm-2 control-label" for="{{ field.title }}">{{ field.title }}</label>
+						<div class="col-sm-10">
+							<code><pre>{{ field.body }}sa fkasjdhf to do:</pre></code>
+						</div>
+					</div>
+					{% elif field.bit_field_type == 'Image' %}
+					<div class="form-group">
+						<label class="col-sm-2 control-label" for="{{ field.title }}Image">{{ field.title }}</label>
+						<div class="col-sm-10">
+							<input type="text" id="{{ field.title }}Image" type="text" class="form-control" name="image_url" value="{{ field.image_url }}">
+							<img src="{{ field.image_url }}" class="img-responsive" alt="Responsive image">
+						</div>
+					</div>
+					{% elif field.bit_field_type == 'Rating' %}
+					<div class="form-group">
+						<label class="col-sm-2 control-label" for="{{ field.title }}Rating">{{ field.title }}</label>
+						<div class="col-sm-10">
+							<input class="rating" data-max="5" data-min="1" id="{{ field.__hash__() }}Rating" name="rating_value" type="number" value="{{ field.rating_value }}" />
+							<input type="hidden" name="rating_scale" value="{{ field.rating_scale }}">
+						</div>
+					</div>
+					<script>
+						$("#{{ field.__hash__() }}Rating").change(function(){
+							submitForm('{{ field.__hash__() }}');
+						})
+					</script>
+					{% elif field.bit_field_type == 'CommentBox' %}
+					<div class="form-group">
+						<label class="col-sm-2 control-label" for="{{ field.title }}CommentBox">{{ field.title }}</label>
+						<div class="col-sm-10">
+							{% for comment in  field.comments %}
+							<quote>{{ comment.body }}</quote><br />
+							<small><label>By: </label>{{ comment.author.email }}</small><br />
+							<hr>
+							{% endfor %}
+							<label class="col-sm-2 control-label" for="{{ field.title }}CommentBody">Body</label>
+							<input type="text" name="body" id="{{ field.title }}CommentBody" class="form-control">
+							<input type="submit" class="btn btn-primary" value="Submit Comment">
+						</div>
+					</div>
+					{% endif %}
+				</form>
+				<form method="post" action="field_manager">
+					<input type="hidden" name="task" value="delete">
+					<input type="hidden" name="field_title" value="{{ field.title }}">
+					<input type="hidden" name="field_type" value="{{ field.bit_field_type }}">
+					<input type="submit" class="btn" value="delete field">
+				</form>
+				{% if field.bit_field_type in ['BlogPost', 'Image', 'Quote'] %}
+				<script>
+
+					$('#{{ field.__hash__() }}').keypress(function(){
+						submitForm('{{ field.__hash__() }}');
+					})
+				</script>
+				{% endif %}
+				{% endfor %}
+
+			</div>
+			<div class="panel-footer">
+				Unused fields:
+				{% for field in unused_bitfields %}
+				<form method="post" action="field_manager" style="display:inline">
+					<input type="hidden" name="task" value="update">
+					<input type="hidden" name="field_title" value="{{ field.title }}">
+					<input type="hidden" name="field_type" value="{{ field.bit_field_type }}">
+					<input type="submit" class="btn btn-xs btn-primary" value="{{ field.title }}">
+				</form>
+				{% endfor %}
+			</div>
 		</div>
+	</div>
+	<div class="col-md-4">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				Add filed
+			</div>
+			<div class="panel-body">
+				<form method="post" action="field_manager">
+					<input type="hidden" name="task" value="create">
+					<div class="radio"><label><input type="radio" name="field_type"value="BlogPost" checked>Blog Post</label></div>
+					<div class="radio"><label><input type="radio" name="field_type"value="Rating" checked>Rating</label></div>
+					<div class="radio"><label><input type="radio" name="field_type"value="Quote" checked>Quote</label></div>
+					<div class="radio"><label><input type="radio" name="field_type"value="CommentBox" checked>Comments</label></div>
+					<div class="radio"><label><input type="radio" name="field_type"value="Image" checked>Image</label></div>
+					<div class="radio"><label><input type="radio" name="field_type"value="Code" checked>Code</label></div>
+					<div class="radio"><label><input type="radio" name="field_type"value="Video" checked>Video</label></div>
+					<input type="text" name="field_title" placeholder="enter unique field title">
+					<input type="submit" class="btn" value="Add">
+				</form>
+			</div>
+			<div class="panel-footer">
+				Field title must be unique
+			</div>
 		</div>
-	{% endif %}
-</form>
-<form method="post" action="field_manager">
-		<input type="hidden" name="task" value="delete">
-		<input type="hidden" name="field_title" value="{{ field.title }}">
-		<input type="hidden" name="field_type" value="{{ field.bit_field_type }}">
-		<input type="submit" class="btn" value="delete field">
-</form>
-	{% if field.bit_field_type in ['BlogPost', 'Image', 'Quote'] %}
-		<script>
-
-		$('#{{ field.__hash__() }}').keypress(function(){
-			submitForm('{{ field.__hash__() }}');
-		})
-		</script>
-	{% endif %}
-{% endfor %}
-
-</div>
-<div class="panel-footer">
-Unused fields:
-	{% for field in unused_bitfields %}
-		<form method="post" action="field_manager" style="display:inline">
-				<input type="hidden" name="task" value="update">
-				<input type="hidden" name="field_title" value="{{ field.title }}">
-				<input type="hidden" name="field_type" value="{{ field.bit_field_type }}">
-				<input type="submit" class="btn btn-xs btn-primary" value="{{ field.title }}">
-		</form>
-	{% endfor %}
-</div>
-</div>
-</div>
-<div class="col-md-4">
-Add filed
-<form method="post" action="field_manager">
-<input type="hidden" name="task" value="create">
-<div class="radio"><label><input type="radio" name="field_type"value="BlogPost" checked>Blog Post</label></div>
-<div class="radio"><label><input type="radio" name="field_type"value="Rating" checked>Rating</label></div>
-<div class="radio"><label><input type="radio" name="field_type"value="Quote" checked>Quote</label></div>
-<div class="radio"><label><input type="radio" name="field_type"value="CommentBox" checked>Comments</label></div>
-<div class="radio"><label><input type="radio" name="field_type"value="Image" checked>Image</label></div>
-<div class="radio"><label><input type="radio" name="field_type"value="Code" checked>Code</label></div>
-<div class="radio"><label><input type="radio" name="field_type"value="Video" checked>Video</label></div>
-<input type="text" name="field_title" placeholder="enter unique field title">
-<input type="submit" class="btn" value="test">
-</form>
-</div>
+	</div>
 </div>
 {% endblock %}
 {% block js_footer %}
 <script>
 	function submitForm(form_id) {
-    $.ajax({type:'POST', url: '', data:$('#'+form_id).serialize()});
-}
+		$.ajax({type:'POST', url: '', data:$('#'+form_id).serialize()});
+	}
 
 </script>
 {% endblock %}

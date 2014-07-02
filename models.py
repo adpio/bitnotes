@@ -3,8 +3,6 @@ from flask import url_for
 from bitnotes import db
 from flask.ext.security import UserMixin, RoleMixin, MongoEngineUserDatastore
 
-
-
 class Role(db.Document, RoleMixin):
     name = db.StringField(max_length=80, unique=True)
     description = db.StringField(max_length=255)
@@ -16,9 +14,22 @@ class User(db.Document, UserMixin):
     confirmed_at = db.DateTimeField()
     roles = db.ListField(db.ReferenceField(Role), default=[])
     bitbooks = db.ListField(db.ReferenceField('BitBook'))
+    mail = db.ReferenceField('BitMail')
 
 user_datastore = MongoEngineUserDatastore(db, User, Role)
 
+class BitMail(db.Document):
+	inbox = db.ListField(db.EmbeddedDocumentField('BitMailItem'))
+	outbox = db.ListField(db.EmbeddedDocumentField('BitMailItem'))
+	trash = db.ListField(db.EmbeddedDocumentField('BitMailItem'))
+
+class BitMailItem(db.EmbeddedDocument):
+	bitnote = db.ReferenceField('BitNote')
+	bitbook = db.ReferenceField('BitBook')
+	from_user = db.ReferenceField('User')
+	to_user = db.ReferenceField('User')
+	created_at = db.DateTimeField(default=datetime.datetime.now, required=True)
+	red = db.BooleanField(required=True, default=False)
 
 class BitField(db.EmbeddedDocument):
 	created_at = db.DateTimeField(default=datetime.datetime.now, required=True)
@@ -49,7 +60,21 @@ class BitNote(db.DynamicDocument):
 				bitbook.cover_fields[field.title] = field
 		bitbook.save()
 
-
+	def send_to(self, to_user, from_user):
+		try:
+			to_user = User.objects.get(email=to_user)
+			message = BitMailItem(bitnote=self, from_user=from_user, to_user=to_user)
+			to_user.mail.inbox.append(message)
+			from_user.mail.outbox.append(message)
+		except:
+			to_user = User(email=to_user)
+			to_user_mail = BitMail().save()
+			to_user.mail = to_user_mail
+			to_user.save()
+			#TODO: send invite here
+			message = BitMailItem(bitnote=self, from_user=from_user, to_user=to_user).save()
+			to_user.mail.inbox.append(message).save()
+			from_user.mail.outbox.append(message).save()
 
 class BitBook(db.DynamicDocument):
 	title = db.StringField(max_length=255, required=True)
@@ -58,8 +83,6 @@ class BitBook(db.DynamicDocument):
 	cover_fields = db.DictField(required=False)
 	bitnotes = db.ListField(db.ReferenceField(BitNote))
 	thumbnail = db.ImageField(size=(800, 600, True), thumbnail_size=(150,150,True))
-
-
 
 # class Post(db.DynamicDocument):
 # 	created_at = db.DateTimeField(default=datetime.datetime.now, required=True)
@@ -100,14 +123,11 @@ class Rating(BitField):
 		else:
 			return 0
 
-
 class Video(BitField):
 	embed_code = db.StringField(required=True)
 
-
 class Image(BitField):
 	image_url = db.StringField(required=False, max_length=255)
-
 
 class Quote(BitField):
 	body = db.StringField(required=False)
@@ -122,10 +142,6 @@ class CommentBox(BitField):
 	def __unicode__(self):
 		return self.title
 
-
-
-
-
 #mocks
 BB = BitBook()
 BN1 = BitNote()
@@ -137,7 +153,7 @@ CB = CommentBox(title='commentbox')
 #CB.comments.append(C)
 BN1.bitfields.append(P)
 BN1.bitfields.append(CB)
-
+U = User.objects.all()[0]
 
 def clean_all_shit():
 	BitNote.objects.all().delete()

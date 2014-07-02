@@ -4,16 +4,17 @@
 <div class="row">
 <h1>
 	{{ bitbook.title }}
-	<span class="label label-success">{{ bitbook.bitnotes|count }}</span>
-	<form method="post" action="note_manager">
-		<input type="hidden" name="action" value="create">
-		<input type="submit" class="btn" value="+">
-	</form>
 </h1>
+<form method="post" action="note_manager">
+	<input type="hidden" name="action" value="create">
+	<input type="submit" class="btn btn-success" value="{{ bitbook.bitnotes|count }}+">
+</form>
 <p>{{ bitbook.description }}</p>
+<p>
 {% for field in bitbook.cover_fields %}
 <span class="label label-primary">{{ field }}</span>
 {% endfor %}
+</p>
 </div>
 
 <div class="list-group">

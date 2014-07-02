@@ -6,3 +6,5 @@ flask_mongoengine
 flask-login
 flask-security
 flask-mail
+flask-debugtoolbar
+PIL
