@@ -1,12 +1,15 @@
 {% extends "base.html" %}
 {% block content %}
-<form method="post" action="note_manager">
-	<input type="hidden" name="action" value="create">
 
-	<input type="submit" class="btn" value="+">
-</form>
 <div class="row">
-<h1>{{ bitbook.title }} <span class="label label-success">{{ bitbook.bitnotes|count }}</span></h1>
+<h1>
+	{{ bitbook.title }}
+	<span class="label label-success">{{ bitbook.bitnotes|count }}</span>
+	<form method="post" action="note_manager">
+		<input type="hidden" name="action" value="create">
+		<input type="submit" class="btn" value="+">
+	</form>
+</h1>
 <p>{{ bitbook.description }}</p>
 {% for field in bitbook.cover_fields %}
 <span class="label label-primary">{{ field }}</span>
