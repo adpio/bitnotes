@@ -1,6 +1,6 @@
 from flask import Blueprint, request, redirect, render_template, url_for
 from flask.views import MethodView
-
+import json
 from flask.ext.mongoengine.wtf import model_form
 from bitnotes.models import *
 from flask.ext.security import login_required
@@ -8,6 +8,19 @@ from flask_login import current_user
 
 posts = Blueprint('posts', __name__, template_folder='templates')
 
+class Mailer(MethodView):
+    @login_required
+    def post(self):
+        from_user = User.objects.get_or_404(id=current_user.id)
+        to_user = request.form['to_user']
+        if request.form['note_id']:
+            note_id = request.form['note_id']
+            note = BitNote.objects.get_or_404(id=note_id)
+            #TODO: security
+            note.send_to(to_user=to_user, from_user=from_user)
+            return json.dumps({'ok':True})
+        else:
+            return json.dumps({'ok':False})
 
 class BitBookShelf(MethodView):
 
@@ -187,5 +200,6 @@ posts.add_url_rule('/<bitbook_id>/<bitnote_id>/field_manager',view_func=FieldMan
 posts.add_url_rule('/', view_func=BitBookShelf.as_view('bitbooks'))
 posts.add_url_rule('/<bitbook_id>/<bitnote_id>/', view_func=BitNoteView.as_view('bitnote'))
 posts.add_url_rule('/<bitbook_id>/note_manager', view_func=BitNoteManager.as_view('bitnote_manager'))
+posts.add_url_rule('/mailer/', view_func=Mailer.as_view('mailer'))
 
 

@@ -8,6 +8,12 @@
 <div class="row">
 	<div class="col-md-8">
 		<div class="panel panel-primary">
+			<form id="mail_form_id">
+				<input type="hidden" name="note_id" value="{{ note.id }}">
+				<input type="text" name="to_user" placeholder="enter email">
+				
+			</form>
+			<button class="btn btn-primary" onclick="sendMail()">Send</button>
 			<div class="panel-heading">delete / send-to / add-owner / show-to</div>
 			<div class="panel-body">
 
@@ -137,8 +143,18 @@
 {% block js_footer %}
 <script>
 	function submitForm(form_id) {
-		$.ajax({type:'POST', url: '', data:$('#'+form_id).serialize()});
+		$.ajax({type:"POST", url: '', data:$("#"+form_id).serialize()});
+	};
+	function sendMail(){
+		$.ajax({
+			type:"POST", 
+			url:"/mailer/", 
+			data:$("#mail_form_id").serialize(),
+			dataType:"json",
+			success: function(data){
+				alert(data.ok)
+			}
+		});
 	}
-
 </script>
 {% endblock %}

@@ -8,7 +8,7 @@ class Role(db.Document, RoleMixin):
     description = db.StringField(max_length=255)
 
 class User(db.Document, UserMixin):
-    email = db.StringField(max_length=255)
+    email = db.StringField(max_length=255, unique=True)
     password = db.StringField(max_length=255)
     active = db.BooleanField(default=True)
     confirmed_at = db.DateTimeField()
@@ -61,20 +61,24 @@ class BitNote(db.DynamicDocument):
 		bitbook.save()
 
 	def send_to(self, to_user, from_user):
-		try:
-			to_user = User.objects.get(email=to_user)
-			message = BitMailItem(bitnote=self, from_user=from_user, to_user=to_user)
-			to_user.mail.inbox.append(message)
-			from_user.mail.outbox.append(message)
-		except:
-			to_user = User(email=to_user)
-			to_user_mail = BitMail().save()
-			to_user.mail = to_user_mail
-			to_user.save()
+		#create mailbox if does not exist:
+		if not from_user.mail:
+			m = BitMail().save()
+			from_user.mail = m
+			from_user.save()
+		to, created = User.objects.get_or_create(email=to_user)
+		if created:
 			#TODO: send invite here
-			message = BitMailItem(bitnote=self, from_user=from_user, to_user=to_user).save()
-			to_user.mail.inbox.append(message).save()
-			from_user.mail.outbox.append(message).save()
+			pass
+		if not to.mail:
+			m = BitMail().save()
+			to.mail = m
+			to.save()	
+		message = BitMailItem(bitnote=self, from_user=from_user, to_user=to)
+		to.mail.inbox.append(message)
+		to.mail.save()
+		from_user.mail.outbox.append(message)
+		from_user.mail.save()
 
 class BitBook(db.DynamicDocument):
 	title = db.StringField(max_length=255, required=True)
