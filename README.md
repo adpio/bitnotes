@@ -1,7 +1,7 @@
 BitNotes
 ========
-#What is that
-BitNotes are a new way of storing, sending and sharing information.
+#What the fuck is that?
+BitNotes is the new way of storing, sending and sharing information.
 #Installation
 ##Use linux:
 python-dev is required for PIL installation so:
@@ -32,3 +32,4 @@ MAIL_DEFAULT_SENDER : default None
 MAIL_MAX_EMAILS : default None
 MAIL_SUPPRESS_SEND : default app.testing
 ```
+Leave __init__.py empty.
