@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+
+
+
+
+<div class="row">
+	<div class="col-md-2">
+		<ul class="nav nav-pills nav-stacked">
+		  <li class="{% if active == 'inbox' %}active{% endif %}"><a href="{{ url_for('posts.mail', folder='inbox') }}"><span class="badge pull-right">{{mail_count.inbox}}</span>Inbox</a></li>
+  		  <li class="{% if active == 'outbox' %}active{% endif %}"><a href="{{ url_for('posts.mail', folder='outbox') }}"><span class="badge pull-right">{{mail_count.outbox}}</span>Outbox</a></li>
+  		  <li class="{% if active == 'trash' %}active{% endif %}"><a href="{{ url_for('posts.mail', folder='trash') }}"><span class="badge pull-right">{{mail_count.trash}}</span>Trash</a></li>
+		</ul>
+	</div>
+	<div class="col-md-10">
+		<table class="table table-hover">
+		<tr>
+			<th>When</th>
+			<th>Read</th>
+			<th>Message</th>
+			<th>
+			{% if active == 'inbox'%}
+			From
+			{% elif active == 'outbox' %}
+			To
+			{% elif active == 'trash' %}
+			From
+			{% endif %}
+			</th>
+		</tr>
+		{% for item in folder %}
+		<tr>
+			<td>{{item.created_at.strftime('%Y %m %d (%H:%M)')}}</td>
+			<td>{{item.red}}</td>
+			<td>{{item.message}}</td>
+			{% if active in ['inbox', 'trash'] %}
+			<td>{{item.from_user.email}}</td>
+			{% else %}
+			<td>{{item.to_user.email}}</td>
+			{% endif %}
+		</tr>
+		{% endfor %}
+		</table>
+	</div>
+</div>
+
+{% endblock %}
