@@ -17,19 +17,10 @@
 {% endblock %}
 {% block content %}
 <div class="row">
-<form action="" method="post" enctype="multipart/form-data">
-{{ forms.render(form) }}
-<div class="actions">
-<input type="submit" class="btn btn-primary" value="save">
-</div>
-</form>
-{{ current_user.email }}
-</div>
 
+<div class="col-sm-9">
 {% for book in bitbooks %}
-
-
-  <div style="margin-bottom:2em;" class="col-sm-4 col-md-3">
+  <div style="margin-bottom:2em;" class="col-sm-4">
     <div class="thumbnail">
       <div class="caption">
         <h3>{{ book.title }}</h3>
@@ -38,8 +29,22 @@
       </div>
     </div>
   </div>
-
-
-
 {% endfor %}
+</div>
+<div class="col-sm-3">
+<div class="panel panel-success">
+<div class="panel-heading">
+Create new BitBook
+</div>
+<div class="panel-body">
+<form action="" method="post" enctype="multipart/form-data">
+{{ forms.render(form) }}
+<div class="actions">
+<input type="submit" class="btn btn-primary" value="save">
+</div>
+</form>
+</div>
+</div>
+</div>
+</div>
 {% endblock %}

@@ -8,12 +8,6 @@
 <div class="row">
 	<div class="col-md-8">
 		<div class="panel panel-primary">
-			<form id="mail_form_id">
-				<input type="hidden" name="note_id" value="{{ note.id }}">
-				<input type="text" name="to_user" placeholder="enter email">
-				
-			</form>
-			<button class="btn btn-primary" onclick="sendMail()">Send</button>
 			<div class="panel-heading">delete / send-to / add-owner / show-to</div>
 			<div class="panel-body">
 
@@ -115,12 +109,31 @@
 		</div>
 	</div>
 	<div class="col-md-4">
-		<div class="panel panel-default">
+		<div id="mail-panel" class="panel panel-success">
+			<div class="panel-heading">Send this note to:</div>
+			<div class="panel-body">
+				<form id="mail_form_id" class="form-vertical" role="form">
+
+					<input type="hidden" name="note_id" value="{{ note.id }}">
+					<div class="form-group">
+					<input type="text" class="form-control" name="to_user" placeholder="enter email">
+					</div>
+					<div class="form-group">
+					<input type="text" class="form-control" name="msg" placeholder="add some message">
+					</div>
+				</form>
+				<button class="btn btn-primary" id="send-mail-button" onclick="sendMail()">Send</button>
+			</div>
+			<div id="mail-confirmation" class="panel-footer" style="display:none;">
+			message sent!
+			</div>
+		</div>
+		<div class="panel panel-warning">
 			<div class="panel-heading">
 				Add filed
 			</div>
 			<div class="panel-body">
-				<form method="post" action="field_manager">
+				<form  method="post" action="field_manager">
 					<input type="hidden" name="task" value="create">
 					<div class="radio"><label><input type="radio" name="field_type"value="BlogPost" checked>Blog Post</label></div>
 					<div class="radio"><label><input type="radio" name="field_type"value="Rating" checked>Rating</label></div>
@@ -129,8 +142,8 @@
 					<div class="radio"><label><input type="radio" name="field_type"value="Image" checked>Image</label></div>
 					<div class="radio"><label><input type="radio" name="field_type"value="Code" checked>Code</label></div>
 					<div class="radio"><label><input type="radio" name="field_type"value="Video" checked>Video</label></div>
-					<input type="text" name="field_title" placeholder="enter unique field title">
-					<input type="submit" class="btn" value="Add">
+					<input class="form-control" type="text" name="field_title" placeholder="enter unique field title">
+					<input type="submit" class="btn btn-primary" value="Add">
 				</form>
 			</div>
 			<div class="panel-footer">
@@ -143,18 +156,28 @@
 {% block js_footer %}
 <script>
 	function submitForm(form_id) {
-		$.ajax({type:"POST", url: '', data:$("#"+form_id).serialize()});
+		$.ajax({type:"POST", url: "", data:$("#"+form_id).serialize()});
 	};
 	function sendMail(){
+		$("#send-mail-button").prop("disabled", true).html("sending ... ");
 		$.ajax({
 			type:"POST", 
 			url:"/mailer/", 
 			data:$("#mail_form_id").serialize(),
 			dataType:"json",
 			success: function(data){
-				alert(data.ok)
+				if (data.ok == true){
+					$("#mail-confirmation").toggle();
+					$("#send-mail-button").prop("disabled", false).html("Send");
+				}
+				else {
+					$("#mail-panel").removeClass("panel-success").addClass("panel-danger");
+					$("#mail-confirmation").toggle().html("Holly Fucking Shit. An Error!");
+					$("#send-mail-button").prop("disabled", false).html("Send");
+				}
 			}
 		});
+		
 	}
 </script>
 {% endblock %}

@@ -7,10 +7,15 @@
     <title>BitNotes</title>
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="http://bootswatch.com/yeti/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='pace.css') }}">
     <style>.content {padding-top: 80px;} a.brand {color: #fff }</style>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script type="text/javascript" src="http://bootswatch.com/assets/js/bootswatch.js"></script>
     <script type="text/javascript" src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://rawgit.com/HubSpot/pace/v0.5.3/pace.min.js"></script>
+
+
+
     {% block extra_head %}
 
     {% endblock %}
@@ -20,7 +25,7 @@
   <body>
 
     {%- block topbar -%}
-<div class="navbar navbar-default navbar-fixed-top">
+    <div class="navbar navbar-default navbar-fixed-top">
       <div class="container">
         <div class="navbar-header">
           <a href="/" class="navbar-brand">BitNotes</a>
@@ -44,9 +49,9 @@
             <li class="dropdown">
               <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="themes">{{ current_user.email }}<span class="caret"></span></a>
               <ul class="dropdown-menu" aria-labelledby="themes">
-                <li><a href="../default/">Default</a></li>
+                <li><a href="{{ url_for('posts.mail', folder='inbox') }}">Mail</a></li>
                 <li class="divider"></li>
-                {% include "security/_menu.html" %}
+                <li><a href="/logout">Logout</a></li>
               </ul>
             </li>
 

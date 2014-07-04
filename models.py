@@ -30,6 +30,7 @@ class BitMailItem(db.EmbeddedDocument):
 	to_user = db.ReferenceField('User')
 	created_at = db.DateTimeField(default=datetime.datetime.now, required=True)
 	red = db.BooleanField(required=True, default=False)
+	message = db.StringField(max_length=255)
 
 class BitField(db.EmbeddedDocument):
 	created_at = db.DateTimeField(default=datetime.datetime.now, required=True)
@@ -51,6 +52,7 @@ class BitField(db.EmbeddedDocument):
 class BitNote(db.DynamicDocument):
 	bitfields = db.ListField(db.EmbeddedDocumentField(BitField))
 	created_at = db.DateTimeField(default=datetime.datetime.now, required=True)
+	title = db.StringField(max_length=255, required=False)
 	meta = {'allow_inheritance':True}
 
 	def save_to_bitbook(self, bitbook):
@@ -60,7 +62,7 @@ class BitNote(db.DynamicDocument):
 				bitbook.cover_fields[field.title] = field
 		bitbook.save()
 
-	def send_to(self, to_user, from_user):
+	def send_to(self, to_user, from_user, msg):
 		#create mailbox if does not exist:
 		if not from_user.mail:
 			m = BitMail().save()
@@ -74,7 +76,7 @@ class BitNote(db.DynamicDocument):
 			m = BitMail().save()
 			to.mail = m
 			to.save()	
-		message = BitMailItem(bitnote=self, from_user=from_user, to_user=to)
+		message = BitMailItem(bitnote=self, from_user=from_user, to_user=to, message=msg)
 		to.mail.inbox.append(message)
 		to.mail.save()
 		from_user.mail.outbox.append(message)

@@ -5,6 +5,7 @@ from flask.ext.mongoengine.wtf import model_form
 from bitnotes.models import *
 from flask.ext.security import login_required
 from flask_login import current_user
+from utils import send_mail
 
 posts = Blueprint('posts', __name__, template_folder='templates')
 
@@ -13,14 +14,40 @@ class Mailer(MethodView):
     def post(self):
         from_user = User.objects.get_or_404(id=current_user.id)
         to_user = request.form['to_user']
+        msg= request.form['msg']
         if request.form['note_id']:
             note_id = request.form['note_id']
             note = BitNote.objects.get_or_404(id=note_id)
             #TODO: security
-            note.send_to(to_user=to_user, from_user=from_user)
+            note.send_to(to_user=to_user, from_user=from_user, msg=msg)
+            mail_ctx = {'subject':'BitNote from %s'%from_user.email,
+                        'sender' : from_user.email,
+                        'recipient': to_user,
+                        'template': 'note',
+                        'context': {'note':note},
+                        }
+            send_mail(**mail_ctx)
             return json.dumps({'ok':True})
         else:
             return json.dumps({'ok':False})
+
+class MailBox(MethodView):
+    @login_required
+    def get(self, folder='inbox'):
+        active = folder
+        user = User.objects.get_or_404(id=current_user.id)
+        mail_count = {
+            'inbox': len(user.mail.inbox),
+            'outbox': len(user.mail.outbox),
+            'trash': len(user.mail.trash),
+        }
+        if folder == 'inbox':
+            folder = user.mail.inbox
+        elif folder == 'outbox':
+            folder = user.mail.outbox
+        else:
+            folder = user.mail.trash
+        return render_template('mailbox.html', user=user, folder=folder, active=active, mail_count=mail_count)
 
 class BitBookShelf(MethodView):
 
@@ -201,5 +228,6 @@ posts.add_url_rule('/', view_func=BitBookShelf.as_view('bitbooks'))
 posts.add_url_rule('/<bitbook_id>/<bitnote_id>/', view_func=BitNoteView.as_view('bitnote'))
 posts.add_url_rule('/<bitbook_id>/note_manager', view_func=BitNoteManager.as_view('bitnote_manager'))
 posts.add_url_rule('/mailer/', view_func=Mailer.as_view('mailer'))
+posts.add_url_rule('/mail/<folder>/', view_func=MailBox.as_view('mail'))
 
 
