@@ -16,7 +16,8 @@
 {% endfor %}
 </p>
 </div>
-
+<div class="row">
+<div class="col-sm-6">
 <div class="list-group">
 {% for note in bitbook.bitnotes %}
   <a href="{{ url_for('posts.bitnote', bitbook_id=bitbook.id, bitnote_id=note.id ) }}" class="list-group-item">
@@ -24,6 +25,11 @@
     <p class="list-group-item-text">some bitnote description will go here once it's effing ready!</p>
   </a>
 {% endfor %}
+</div>
+</div>
+<div class="col-sm-6">
+
+</div>
 </div>
 {% for field in bitbook.cover_fields %}
 
