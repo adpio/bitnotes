@@ -18,7 +18,7 @@ pip install -r reqirements.txt
 python manage.py runserver
 ```
 ##Extra config
-If you want to send mail you have to create config for flask-mail. Create "config" folder in the project dir and 2 files: ____init____.py and email.py.
+If you want to send mail you have to create config for flask-mail. Create "config" folder in the project dir and 2 files: \_\_init\_\_.py and email.py.
 Edit email.py to:
 ```python
 MAIL_SERVER = 'smtp.gmail.com'
