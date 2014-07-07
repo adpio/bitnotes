@@ -1,0 +1,38 @@
+{% macro render_field_for_view(field) %}
+<h2>{{ field.title }}</h2>
+{% if field.bit_field_type == 'BlogPost' %}
+
+<p>{{ field.body }}</p>
+
+{% elif field.bit_field_type == 'Quote' %}
+
+<blockquote class="blockquote">
+<p>{{ field.body }}</p>
+<footer>{{ field.author }}</footer>
+</blockquote>
+
+
+{% elif field.bit_field_type == 'Code' %}
+
+<code><pre>{{ field.body }}sa fkasjdhf to do:</pre></code>
+
+{% elif field.bit_field_type == 'Image' %}
+
+<img src="{{ field.image_url }}" class="img-responsive" alt="Responsive image">
+
+{% elif field.bit_field_type == 'Rating' %}
+
+<input class="rating" data-max="5" data-min="1" id="{{ field.__hash__() }}Rating" name="rating_value" type="number" value="{{ field.rating_value }}" />
+<input type="hidden" name="rating_scale" value="{{ field.rating_scale }}">
+
+{% elif field.bit_field_type == 'CommentBox' %}
+
+{% for comment in  field.comments %}
+<quote>{{ comment.body }}</quote><br />
+<footer><label>By: {{ comment.author.email }}</footer>
+<hr>
+{% endfor %}
+
+
+{% endif %}
+{% endmacro %}

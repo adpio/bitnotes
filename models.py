@@ -149,17 +149,17 @@ class CommentBox(BitField):
 		return self.title
 
 #mocks
-BB = BitBook()
-BN1 = BitNote()
-Q = Quote(title='A quote', body='long body', author='Adam Piotrowski', embedded_in=BN1)
-BN1.bitfields.append(Q)
-P = BlogPost(title='post', body='long post of a blog post')
-#C = Comment(body='asdasd', author=User.objects.all()[0])
-CB = CommentBox(title='commentbox')
-#CB.comments.append(C)
-BN1.bitfields.append(P)
-BN1.bitfields.append(CB)
-U = User.objects.all()[0]
+# BB = BitBook()
+# BN1 = BitNote()
+# Q = Quote(title='A quote', body='long body', author='Adam Piotrowski', embedded_in=BN1)
+# BN1.bitfields.append(Q)
+# P = BlogPost(title='post', body='long post of a blog post')
+# #C = Comment(body='asdasd', author=User.objects.all()[0])
+# CB = CommentBox(title='commentbox')
+# #CB.comments.append(C)
+# BN1.bitfields.append(P)
+# BN1.bitfields.append(CB)
+# U = User.objects.all()[0]
 
 def clean_all_shit():
 	BitNote.objects.all().delete()

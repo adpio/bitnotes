@@ -36,6 +36,10 @@ class MailBox(MethodView):
     def get(self, folder='inbox'):
         active = folder
         user = User.objects.get_or_404(id=current_user.id)
+        if not user.mail:
+            mail = BitMail().save()
+            user.mail = mail
+            user.save()
         mail_count = {
             'inbox': len(user.mail.inbox),
             'outbox': len(user.mail.outbox),
