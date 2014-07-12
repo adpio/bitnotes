@@ -1,31 +1,64 @@
-from flask import Blueprint, request, redirect, render_template, url_for
+from flask import Blueprint, request, redirect, render_template, url_for, flash
 from flask.views import MethodView
 import json
 from flask.ext.mongoengine.wtf import model_form
+# from flask.ext.mongoengine.wtf.fields import *
+# from flask.ext.mongoengine.wtf.model import Form
 from bitnotes.models import *
 from flask.ext.security import login_required
 from flask_login import current_user
 from utils import send_mail
+#forms
+from wtforms import Form
+from wtforms import TextField, BooleanField, HiddenField, TextField, TextAreaField
+from wtforms.validators import DataRequired, Email
 
 posts = Blueprint('posts', __name__, template_folder='templates')
+
+
+class SendBitBookForm(Form):
+    to_user = TextField('email', validators=[Email()])
+    message = TextField('message', validators=[DataRequired()])
+    o = BooleanField('o')
+    e = BooleanField('e')
+    v = BooleanField('v')
+    p = BooleanField('p')
 
 class Mailer(MethodView):
     @login_required
     def post(self):
         from_user = User.objects.get_or_404(id=current_user.id)
         to_user = request.form['to_user']
-        msg= request.form['msg']
-        if request.form['note_id']:
+        msg = request.form['msg']
+        access = {}
+        for x in ['o','e','v','p']:
+            if x not in request.form:
+                access[x]=0
+            else:
+                access[x]=1
+        if 'note_id' in request.form:
             note_id = request.form['note_id']
             note = BitNote.objects.get_or_404(id=note_id)
             #TODO: security
-            note.send_to(to_user=to_user, from_user=from_user, msg=msg)
+            note.share_to(to_user=to_user, from_user=from_user, msg=msg, access=access)
             mail_ctx = {'subject':'BitNote from %s'%from_user.email,
                         'sender' : from_user.email,
                         'recipient': to_user,
                         'template': 'note',
                         'context': {'note':note},
                         }
+            send_mail(**mail_ctx)
+            return json.dumps({'ok':True})
+
+        elif 'bitbook_id' in request.form:
+            bitbook = BitBook.objects.get_or_404(id=request.form['bitbook_id'])
+            bitbook.share_to(to_user=to_user, from_user=from_user, msg=msg, access=access)
+            mail_ctx = {'subject':'BitBook from %s'%from_user.email,
+                        'sender' : from_user.email,
+                        'recipient': to_user,
+                        'template': 'bitbook',
+                        'context': {'bitbook':bitbook},    
+            }
             send_mail(**mail_ctx)
             return json.dumps({'ok':True})
         else:
@@ -40,29 +73,75 @@ class MailBox(MethodView):
             mail = BitMail().save()
             user.mail = mail
             user.save()
+        m = user.mail
         mail_count = {
-            'inbox': len(user.mail.inbox),
-            'outbox': len(user.mail.outbox),
-            'trash': len(user.mail.trash),
+            'inbox': len(m.inbox),
+            'outbox': len(m.outbox),
+            'trash': len(m.trash),
         }
         if folder == 'inbox':
-            folder = user.mail.inbox
+            folder = m.inbox
         elif folder == 'outbox':
-            folder = user.mail.outbox
+            folder = m.outbox
         else:
-            folder = user.mail.trash
-        return render_template('mailbox.html', user=user, folder=folder, active=active, mail_count=mail_count)
+            folder = m.trash
+        #TODO: security
+        if request.args != {} and request.args['active_item']:
+            active_item_id = request.args['active_item']
+            active_item = BitMailItem.objects.get_or_404(id=active_item_id)
+        else:
+            active_item = None
+        return render_template('mailbox.html', user=user, folder=folder, active=active, mail_count=mail_count, active_item=active_item)
+
+class MailHandler(MethodView):
+    @login_required
+    def get(self, folder, bitmail_id, action):
+        #get context
+        user = User.objects.get_or_404(id=current_user.id)
+        bitmail = BitMailItem.objects.get_or_404(id=bitmail_id)
+
+        if action == 'destroy':
+            bitmail.delete()
+            flash(u'Destroyed', 'danger')
+        if action == 'trashit' and folder in ['inbox', 'outbox']:
+            folder = user.mail[folder]
+            del(folder[folder.index(bitmail)])
+            user.mail.trash.append(bitmail)
+            user.mail.save()
+            flash(u'Trashed', 'warning')
+        if action == 'add_to_bit_books':
+            if bitmail.bitbook in user.bitbooks:
+                flash(u'Already in your BitBooks', 'warning')
+            else:
+                user.bitbooks.append(bitmail.bitbook)
+                user.save()
+                flash(u'Added', 'success')
+        if action == 'create_bitbook_from_note':
+            note = bitmail.bitnote
+            B = BitBook(title='Enter BitBook Title', description='Add some description')
+            B.save()
+            note.save_to_bitbook(bitbook=B)
+            user.bitbooks.append(B)
+            user.save()
+            flash(u'Created', 'success')
+        if action == 'add_note_to_bitbook':
+            B = BitBook.objects.get_or_404(id=request.args['b_id'])
+            note = bitmail.bitnote
+            note.save_to_bitbook(bitbook=B)
+            flash(u'Added', 'success')
+        return redirect(url_for('posts.mail', folder=folder))
 
 class BitBookShelf(MethodView):
 
-    form = model_form(BitBook, exclude=['created_at','cover_fields','bitnotes'])
-
+    form = model_form(BitBook, exclude=['created_at','cover_fields','bitnotes','owners','editors','viewers'])
+    mail_form = SendBitBookForm()
     def get_context(self):
         user = User.objects.get_or_404(id=current_user.id)
         context = {
             'form': self.form(request.form),
             'bitbooks': user.bitbooks,
             'user' : user,
+            'mail_form': self.mail_form,
         }
         return context
 
@@ -79,6 +158,7 @@ class BitBookShelf(MethodView):
         if form.validate():
             b = BitBook()
             form.populate_obj(b)
+            b.owners.append(user)
             b.save()
             user.bitbooks.append(b)
             user.save()
@@ -87,9 +167,18 @@ class BitBookShelf(MethodView):
 
 
 class BitBookView(MethodView):
+    @login_required
     def get(self, bitbook_id):
         bitbook = BitBook.objects.get_or_404(id=bitbook_id)
-        return render_template('bitbook.html', bitbook=bitbook)
+        if request.args != {} and request.args['active']:
+            active = request.args['active']
+            #TODO: security
+            a = BitNote.objects.get_or_404(id=active)
+        elif bitbook.bitnotes:
+            a = bitbook.bitnotes[-1]
+        else:
+            a = None
+        return render_template('bitbook.html', bitbook=bitbook, active=a)
     def post(self):
         pass
 
@@ -112,21 +201,26 @@ class BitNoteView(MethodView):
         note = BitNote.objects.get_or_404(id=bitnote_id)
         field_type = request.form['field_type']
         field_title = request.form['field_title']
-        field = [x for x in note.bitfields if x.title == field_title][0]
-        if field:
-            if field_type == 'CommentBox':
-                body = request.form['body']
-                author = User.objects.get_or_404(id=current_user.id)
-                #author = User().save()
-                c = Comment(body=body, author=author)
-                field.comments.append(c)
-
-            else:
-                constructor = globals()[field_type]
-                mform = model_form(constructor, exclude=['created_at','title'])
-                form = mform(request.form)
-                form.populate_obj(field)
+        if field_type == 'Heading':
+            h = request.form['Heading']
+            note.title = h
             note.save()
+        else:
+            field = [x for x in note.bitfields if x.title == field_title][0]
+            if field:
+                if field_type == 'CommentBox':
+                    body = request.form['body']
+                    author = User.objects.get_or_404(id=current_user.id)
+                    #author = User().save()
+                    c = Comment(body=body, author=author)
+                    field.comments.append(c)
+
+                else:
+                    constructor = globals()[field_type]
+                    mform = model_form(constructor, exclude=['created_at','title'])
+                    form = mform(request.form)
+                    form.populate_obj(field)
+                note.save()
 
         return render_template('notes/note.html', note=note)       
 
@@ -222,6 +316,7 @@ class DetailView(MethodView):
         return render_template('posts/detail.html', **context)
 
 
+
 # Register the urls
 #posts.add_url_rule('/', view_func=ListView.as_view('list'))
 #posts.add_url_rule('/<slug>/', view_func=DetailView.as_view('detail'))
@@ -233,5 +328,6 @@ posts.add_url_rule('/<bitbook_id>/<bitnote_id>/', view_func=BitNoteView.as_view(
 posts.add_url_rule('/<bitbook_id>/note_manager', view_func=BitNoteManager.as_view('bitnote_manager'))
 posts.add_url_rule('/mailer/', view_func=Mailer.as_view('mailer'))
 posts.add_url_rule('/mail/<folder>/', view_func=MailBox.as_view('mail'))
+posts.add_url_rule('/mail/<folder>/<bitmail_id>/<action>', view_func=MailHandler.as_view('mail_handler'))
 
 

@@ -1,8 +1,7 @@
 {% extends "base.html" %}
+{% from "notes/_macros.html" import render_note_for_view, render_bitbook_for_view %}
+
 {% block content %}
-
-
-
 
 <div class="row">
 	<div class="col-md-2">
@@ -13,8 +12,9 @@
 		</ul>
 	</div>
 	<div class="col-md-10">
-		<table class="table table-hover">
+		<table class="table table-hover" >
 		<tr>
+			<th>Hwat</th>
 			<th>When</th>
 			<th>Read</th>
 			<th>Message</th>
@@ -29,7 +29,15 @@
 			</th>
 		</tr>
 		{% for item in folder %}
-		<tr>
+		<tr data-href="?active_item={{item.id}}" style="cursor: pointer;" {%if item.id == active_item.id%}class="active"{%endif%}>
+
+			<td>
+			{% if item.bitnote %}
+				<span class="glyphicon glyphicon-list-alt" data-toggle="tooltip" data-placement="left" title="BitNote">
+			{% else %}
+				<span class="glyphicon glyphicon-book" data-toggle="tooltip" data-placement="left" title="BitBook">
+			{% endif %}
+			</td>
 			<td>{{item.created_at.strftime('%Y %m %d (%H:%M)')}}</td>
 			<td>{{item.red}}</td>
 			<td>{{item.message}}</td>
@@ -41,7 +49,19 @@
 		</tr>
 		{% endfor %}
 		</table>
+		{% if active_item.bitnote %}
+		{{ render_note_for_view(active_item, folder=folder._name) }}
+		{% elif active_item.bitbook %}
+		{{ render_bitbook_for_view(active_item, folder=folder._name) }}
+		{% endif %}
 	</div>
 </div>
-
+<script>
+	$(document).ready(function(){
+    $('table tr').click(function(){
+        window.location = $(this).data('href');
+        return false;
+    });
+});
+</script>
 {% endblock %}

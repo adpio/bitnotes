@@ -8,7 +8,19 @@
 <div class="row">
 	<div class="col-md-8">
 		<div class="panel panel-primary">
-			<div class="panel-heading">delete / send-to / add-owner / show-to</div>
+			<div class="panel-heading">
+				<form role="form" method="post" class="form-horizontal" id="HeadingForm" >
+					<input type="hidden" name="field_title" value="Heading">
+					<input type="hidden" name="field_type" value="Heading">
+					<input style="background-color:inherit; color:inherit; border:none;" name="Heading" id="Heading" class="form-control" type="text">
+				</form>
+				<script>
+
+					$("#Heading").keypress(function(){
+						submitForm("HeadingForm");
+					})
+				</script>
+			</div>
 			<div class="panel-body">
 
 				{% for field in note.bitfields %}
@@ -121,6 +133,14 @@
 					<div class="form-group">
 					<input type="text" class="form-control" name="msg" placeholder="add some message">
 					</div>
+					<div class="col-sm-offset-2 col-sm-10">
+				      <div class="checkbox">
+				        <label><input type="checkbox" name="o" value="1">O</label>
+				        <label><input type="checkbox" name="e" value="1">E</label>
+				        <label><input type="checkbox" name="v" value="1">V</label>
+				        <label><input type="checkbox" name="p" value="1">P</label>
+				      </div>
+				    </div>
 				</form>
 				<button class="btn btn-primary" id="send-mail-button" onclick="sendMail()">Send</button>
 			</div>
@@ -130,7 +150,7 @@
 		</div>
 		<div class="panel panel-warning">
 			<div class="panel-heading">
-				Add filed
+				Add field
 			</div>
 			<div class="panel-body">
 				<form  method="post" action="field_manager">

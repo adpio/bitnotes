@@ -1,50 +1,125 @@
 {% extends "base.html" %}
-{% import "_forms2.html" as forms %}
+
+{% from '_forms.html' import render_form %}
 {% block extra_head %}
 <style type="text/css">
-.caption p{
-	line-height:1.2em; 
-	height:3.6em;
-	overflow:hidden;
-}
-.caption h3{
-	line-height:1.2em; 
-	height:1.2em;
-	overflow:hidden;
-}
+  .caption p{
+   line-height:1.2em; 
+   height:3.6em;
+   overflow:hidden;
+ }
+ .caption h3{
+   line-height:1.2em; 
+   height:1.2em;
+   overflow:hidden;
+ }
 
 </style>
 {% endblock %}
 {% block content %}
 <div class="row">
 
-<div class="col-sm-9">
-{% for book in bitbooks %}
-  <div style="margin-bottom:2em;" class="col-sm-4">
-    <div class="thumbnail">
-      <div class="caption">
-        <h3>{{ book.title }}</h3>
-        <p>{{ book.description }}</p>
-        <p><a href="{{ url_for('posts.bitbook', bitbook_id=book.id) }}" class="btn btn-primary" role="button">Open</a></p>
+  <div class="col-sm-9">
+    {% for book in bitbooks %}
+    <div style="margin-bottom:2em;" class="col-sm-4">
+      <div class="thumbnail">
+        <div class="caption">
+          <div class="pull-right"><span class="glyphicon glyphicon-send" style="cursor:pointer;" onclick="showMailModal('{{book.id}}');" data-toggle="tooltip" data-placement="left" title="send to email"></div>
+          <h3>{{ book.title }}</h3>
+          <p>{{ book.description }}</p>
+          <p>
+            <a href="{{ url_for('posts.bitbook', bitbook_id=book.id) }}" class="btn btn-primary" role="button">Open</a>
+            <!-- Button trigger modal -->
+            
+          </p>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  <div class="col-sm-3">
+    <div class="panel panel-success">
+      <div class="panel-heading">
+        Create new BitBook
+      </div>
+      <div class="panel-body">
+      {{ render_form(form, action_url='', action_text='Submit Form') }}
       </div>
     </div>
   </div>
-{% endfor %}
-</div>
-<div class="col-sm-3">
-<div class="panel panel-success">
-<div class="panel-heading">
-Create new BitBook
-</div>
-<div class="panel-body">
-<form action="" method="post" enctype="multipart/form-data">
-{{ forms.render(form) }}
-<div class="actions">
-<input type="submit" class="btn btn-primary" value="save">
-</div>
-</form>
-</div>
-</div>
-</div>
 </div>
 {% endblock %}
+{% block extra_body %}
+
+<!-- Modal -->
+<div class="modal fade" id="MailModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog" style="position:static;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="myModalLabel">Share Bitbook with:</h4>
+      </div>
+      <div class="modal-body">
+        <div id="mail-panel" class="panel panel-success">
+          <div class="panel-heading">Send this note to:</div>
+          <div class="panel-body">
+            <form id="mail_form_id" action="/mailer/" method="post" class="form-vertical" role="form">
+
+              <input type="hidden" id="mailer-bb-id" name="bitbook_id" value="">
+              <div class="form-group">
+                <input type="text" class="form-control" name="to_user" placeholder="enter email">
+              </div>
+              <div class="form-group">
+                <input type="text" class="form-control" name="msg" placeholder="add some message">
+              </div>
+              <div class="checkbox">
+                <label><input type="checkbox" name="o" value="1">Owner</label>
+                <label><input type="checkbox" name="e" value="1">Editor</label>
+                <label><input type="checkbox" name="v" value="1">Viewer</label>
+                <label><input type="checkbox" name="p" value="1">Public</label>
+              <input type="submit">
+              </form>
+            </div>
+            <button class="btn btn-primary" id="send-mail-button" onclick="sendMail()">Send</button>
+          </div>
+          <div id="mail-confirmation" class="panel-footer" style="display:none;">
+            Message sent!
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        Information
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  function showMailModal(bitbook){
+    $('#mailer-bb-id').val(bitbook);
+    $('#MailModal').modal('show');
+  };
+  function sendMail(){
+    $("#send-mail-button").prop("disabled", true).html("sending ... ");
+    $.ajax({
+      type:"POST", 
+      url:"/mailer/", 
+      data:$("#mail_form_id").serialize(),
+      dataType:"json",
+      success: function(data){
+        if (data.ok == true){
+          $("#mail-confirmation").toggle();
+          $("#send-mail-button").prop("disabled", false).html("Send");
+        }
+        else {
+          $("#mail-panel").removeClass("panel-success").addClass("panel-danger");
+          $("#mail-confirmation").toggle().html("Holly Fucking Shit. An Error!");
+          $("#send-mail-button").prop("disabled", false).html("Send");
+        }
+      }
+    });
+    
+  }
+</script>
+{% endblock %}
+
+
