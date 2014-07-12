@@ -9,7 +9,11 @@ sys.setdefaultencoding('utf8')
 
 app = Flask(__name__)
 
-from config.security import *
+from config.debug import debugging
+app.debug = debugging
+
+#import security conf
+app.config.from_object('config.security')
 
 db = MongoEngine(app)
 

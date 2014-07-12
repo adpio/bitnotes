@@ -18,7 +18,12 @@ pip install -r reqirements.txt
 python manage.py runserver
 ```
 ##Extra config
-If you want to send mail you have to create config for flask-mail. Create "config" folder in the project dir and 2 files: \_\_init\_\_.py security.py and email.py.
+If you want to send mail you have to create config for flask-mail. Create "config" folder in the project dir and 4 files: 
+- \_\_init\_\_.py 
+- security.py 
+- email.py
+- debug.py
+
 Edit email.py to:
 ```python
 MAIL_SERVER = 'smtp.gmail.com'
@@ -30,13 +35,16 @@ MAIL_PASSWORD = 'password'
 ```
 Edit security.py to:
 ```python
-app.debug = True
-app.config["MONGODB_SETTINGS"] = {"DB": "bitnotes"}
-app.config["SECRET_KEY"] = "secret"
-app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
-app.config['DEFAULT_MAIL_SENDER'] = 'postman@bitnotes.com'
-app.config['SECURITY_REGISTERABLE'] = True
-app.config['SECURITY_CONFIRMABLE'] = True
-app.config['SECURITY_RECOVERABLE'] = True
+MONGODB_SETTINGS = {"DB": "bitnotes"}
+SECRET_KEY = "secrest_key"
+DEBUG_TB_INTERCEPT_REDIRECTS = False
+DEFAULT_MAIL_SENDER = 'postman@bitnotes.com'
+SECURITY_REGISTERABLE = True
+SECURITY_CONFIRMABLE = True
+SECURITY_RECOVERABLE = True
+```
+Edit debug.py to:
+```python
+debugging = True
 ```
 Leave __init__.py empty.
