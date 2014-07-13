@@ -179,8 +179,15 @@ class BitBookView(MethodView):
         else:
             a = None
         return render_template('bitbook.html', bitbook=bitbook, active=a)
-    def post(self):
-        pass
+    @login_required
+    def post(self, bitbook_id):
+        bb = BitBook.objects.get_or_404(id=bitbook_id)
+        t = request.form['title']
+        d = request.form['description']
+        bb.title = t
+        bb.description = d
+        bb.save()
+        return redirect(url_for('posts.bitbook', bitbook_id=bb.id))
 
 
 class BitNoteView(MethodView):

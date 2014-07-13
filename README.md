@@ -47,4 +47,4 @@ Edit debug.py to:
 ```python
 debugging = True
 ```
-Leave __init__.py empty.
+Leave \_\_init\_\_.py empty.

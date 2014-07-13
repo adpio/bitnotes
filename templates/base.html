@@ -6,10 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>BitNotes</title>
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="http://bootswatch.com/yeti/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="http://bootswatch.com/darkly/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='pace.css') }}">
     <link href="{{ url_for('static', filename='favicon.ico') }}" rel="icon" type="image/x-icon" />
-    <style>.content {padding-top: 80px;} a.brand {color: #fff }</style>
+    <style>.content {padding-top: 80px;} a.brand {color: #fff } span.glyphicon {font-size: 1.2em;}</style>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script type="text/javascript" src="http://bootswatch.com/assets/js/bootswatch.js"></script>
     <script type="text/javascript" src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
@@ -30,7 +30,7 @@
     <div class="navbar navbar-default navbar-fixed-top">
       <div class="container">
         <div class="navbar-header">
-          <a href="/" class="navbar-brand">BitNotes</a>
+          <a href="/" class="navbar-brand" data-method="put">BitNotes</a>
           <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>

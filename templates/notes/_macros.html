@@ -36,6 +36,7 @@
 {% endmacro %}
 
 {% macro render_note_for_view(active_item, folder) %}
+
 	<div class="panel panel">
 	<div class="panel-heading">
 	{{ active_item.bitnote.title }}
@@ -66,27 +67,139 @@
 {% endmacro %}
 
 {% macro render_bitbook_for_view(active_item, folder) %}
-<div class="panel">
-	<div class="panel panel-heading">
-		{{ active_item.bitbook.title }}
-			<span class="pull-right">
-			{{ active_item.id }}
-				<span class="glyphicon glyphicon-send" data-toggle="tooltip" data-placement="left" title="Send to other email"></span>
-				<a href="{{'/mail/'+folder+'/'+active_item.id|string()+'/add_to_bit_books'}}">
-					<span class="glyphicon glyphicon-download" data-toggle="tooltip" data-placement="left" title="Add to Your BitBooks"></span>
-				</a>
-				<a href="{{'/mail/'+folder+'/'+active_item.id|string()+'/destroy'}}">
-				<span class="glyphicon glyphicon-fire" data-toggle="tooltip" data-placement="top" title="Destroy Bitbook"></span>
-				</a>
-				<a href="{{'/mail/'+folder+'/'+active_item.id|string()+'/trashit'}}">
-				<span class="glyphicon glyphicon-trash" data-toggle="tooltip" data-placement="top" title="Trash it"></span>
-				</a>
-				<span class="glyphicon glyphicon-eye-open success" data-toggle="tooltip" data-placement="top" title="You can see this"></span>
-				<span class="glyphicon glyphicon-book" data-toggle="tooltip" data-placement="right" title="Create new BitBook with this note"></span>
-			</span>
+	<div class="panel">
+		<div class="panel panel-heading">
+			{{ active_item.bitbook.title }}
+				<span class="pull-right">
+				
+					<span class="glyphicon glyphicon-send" data-toggle="tooltip" data-placement="left" title="Send to other email"></span>
+					<a href="{{'/mail/'+folder+'/'+active_item.id|string()+'/add_to_bit_books'}}">
+						<span class="glyphicon glyphicon-download" data-toggle="tooltip" data-placement="left" title="Add to Your BitBooks"></span>
+					</a>
+					<a href="{{'/mail/'+folder+'/'+active_item.id|string()+'/destroy'}}">
+					<span class="glyphicon glyphicon-fire" data-toggle="tooltip" data-placement="top" title="Destroy Bitbook"></span>
+					</a>
+					<a href="{{'/mail/'+folder+'/'+active_item.id|string()+'/trashit'}}">
+					<span class="glyphicon glyphicon-trash" data-toggle="tooltip" data-placement="top" title="Trash it"></span>
+					</a>
+					<span class="glyphicon glyphicon-eye-open success" data-toggle="tooltip" data-placement="top" title="You can see this"></span>
+					<span class="glyphicon glyphicon-book" data-toggle="tooltip" data-placement="right" title="Create new BitBook with this note"></span>
+				</span>
+		</div>
+		<div class="panel panel-body">{{ active_item.bitbook.description }}</div>
+		
 	</div>
-	<div class="panel panel-body">{{ active_item.bitbook.description }}</div>
+	<script>$("[data-toggle=tooltip]").tooltip()</script>
+{% endmacro %}
+
+{% macro render_bitnote_for_editor(note, unused_bitfields) %}
+	<div class="panel panel-primary">
+		<div class="panel-heading">
+			<form role="form" method="post" class="form-horizontal" id="HeadingForm" >
+				<input type="hidden" name="field_title" value="Heading">
+				<input type="hidden" name="field_type" value="Heading">
+				<input style="background-color:inherit; color:inherit; border:none;" name="Heading" id="Heading" class="form-control autosubmit" type="text" value="{{ note.title }}">
+			</form>
+
+		</div>
+		<div class="panel-body">
+
+			{% for field in note.bitfields %}
+			<form class="form-horizontal" role="form" method="post" id="{{ field.__hash__() }}">
+				<input type="hidden" name="field_title" value="{{ field.title }}">
+				<input type="hidden" name="field_type" value="{{ field.bit_field_type }}">
+
+				{% if field.bit_field_type == 'BlogPost' %}
+				<div class="form-group">
+					<label class="col-sm-2 control-label" for="{{ field.title }}Text">{{ field.title }}</label>
+					<div class="col-sm-10">
+						<textarea rows="5" style="resize:vertical" id="{{ field.title }}Text" name="body" type="text" class="form-control autosubmit">{{ field.body }}</textarea>
+					</div>
+				</div>
+				{% elif field.bit_field_type == 'Quote' %}
+				<div class="form-group">
+					<label class="col-sm-2 control-label" for="{{ field.title }}Text">{{ field.title }}</label>
+					<div class="col-sm-10">
+						<textarea id="{{ field.title }}Text" style="resize:vertical" type="text" name="body" class="form-control autosubmit">{{ field.body }}</textarea>
+					</div>
+					<label class="col-sm-2 control-label" for="{{ field.title }}Author">By</label>
+					<div class="col-sm-10">
+						<input type="text" id="{{ field.title }}Author" type="text" class="form-control  autosubmit" name="author" value="{{ field.author }}">
+					</div>
+				</div>
+				{% elif field.bit_field_type == 'Code' %}
+				<div class="form-group">
+					<label class="col-sm-2 control-label" for="{{ field.title }}">{{ field.title }}</label>
+					<div class="col-sm-10">
+						<code><pre>{{ field.body }}sa fkasjdhf to do:</pre></code>
+					</div>
+				</div>
+				{% elif field.bit_field_type == 'Image' %}
+				<div class="form-group">
+					<label class="col-sm-2 control-label" for="{{ field.title }}Image">{{ field.title }}</label>
+					<div class="col-sm-10">
+						<input type="text" id="{{ field.title }}Image" type="text" class="form-control  autosubmit" name="image_url" value="{{ field.image_url }}">
+						<img src="{{ field.image_url }}" class="img-responsive" alt="Responsive image">
+					</div>
+				</div>
+				{% elif field.bit_field_type == 'Rating' %}
+				<div class="form-group">
+					<label class="col-sm-2 control-label" for="{{ field.title }}Rating">{{ field.title }}</label>
+					<div class="col-sm-10">
+						<input class="rating  autosubmit" data-max="5" data-min="1" id="{{ field.__hash__() }}Rating" name="rating_value" type="number" value="{{ field.rating_value }}" />
+						<input type="hidden" name="rating_scale" value="{{ field.rating_scale }}">
+					</div>
+				</div>
+				{% elif field.bit_field_type == 'CommentBox' %}
+				<div class="form-group">
+					<label class="col-sm-2 control-label" for="{{ field.title }}CommentBox">{{ field.title }}</label>
+					<div class="col-sm-10">
+						{% for comment in  field.comments %}
+						<quote>{{ comment.body }}</quote><br />
+						<small><label>By: </label>{{ comment.author.email }}</small><br />
+						<hr>
+						{% endfor %}
+						<label class="col-sm-2 control-label" for="{{ field.title }}CommentBody">Body</label>
+						<input type="text" name="body" id="{{ field.title }}CommentBody" class="form-control">
+						<input type="submit" class="btn btn-primary" value="Submit Comment">
+					</div>
+				</div>
+				{% endif %}
+			</form>
+			<form method="post" class="pull-right" action="field_manager">
+				<input type="hidden" name="task" value="delete">
+				<input type="hidden" name="field_title" value="{{ field.title }}">
+				<input type="hidden" name="field_type" value="{{ field.bit_field_type }}">
 	
-</div>
-<script>$("[data-toggle=tooltip]").tooltip()</script>
+				<input class="btn btn-xs" type="submit" value="Remove">
+			</form>
+			<br>
+			<hr />
+
+			{% endfor %}
+
+		</div>
+		<div class="panel-footer">
+			Unused fields:
+			{% for field in unused_bitfields %}
+			<form method="post" action="field_manager" style="display:inline">
+				<input type="hidden" name="task" value="update">
+				<input type="hidden" name="field_title" value="{{ field.title }}">
+				<input type="hidden" name="field_type" value="{{ field.bit_field_type }}">
+				<input type="submit" class="btn btn-xs btn-primary" value="{{ field.title }}">
+			</form>
+			{% endfor %}
+		</div>
+	</div>
+<script>
+
+function submitIt(form) {
+	$.ajax({type:"POST", url: "", data:$(form).serialize()});
+};
+$(".autosubmit").on("keypress change cut paste", function () {
+	var f = $(this).closest("form")
+	submitIt(f);
+})
+</script>
+
 {% endmacro %}

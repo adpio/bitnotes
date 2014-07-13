@@ -89,6 +89,19 @@
         </div>
     {% endfor %}
 {%- endmacro %}
+
+{# Renders submit button properly#}
+{% macro render_submit_field(field, btn_class='btn btn-default') %}
+     <div class="form-group {% if field.errors %}has-error{% endif %} {{ kwargs.pop('class_', '') }}">
+
+        {{ field(class_=btn_class, **kwargs) }}
+        {% if field.errors %}
+            {% for e in field.errors %}
+                <p class="help-block">{{ e }}</p>
+            {% endfor %}
+        {% endif %}
+    </div>
+{% endmacro %}
  
 {# Renders WTForm in bootstrap way. There are two ways to call function:
      - as macros: it will render all field forms using cycle to iterate over them
@@ -106,7 +119,7 @@
         action_text - text of submit button
         class_ - sets a class for form
     #}
-{% macro render_form(form, action_url='', action_text='Submit', class_='', btn_class='btn btn-default') -%}
+{% macro render_form(form, action_url='', action_text='Submit', class_='', btn_class='btn btn-default', show_submit=True ) %}
  
     <form method="POST" action="{{ action_url }}" role="form" class="{{ class_ }}">
         {{ form.hidden_tag() if form.hidden_tag }}
@@ -118,11 +131,15 @@
                     {{ render_checkbox_field(f) }}
                 {% elif f.type == 'RadioField' %}
                     {{ render_radio_field(f) }}
+                {% elif f.type == 'SubmitField' %}
+                    {{ render_submit_field(f, btn_class) }}
                 {% else %}
                     {{ render_field(f) }}
                 {% endif %}
             {% endfor %}
         {% endif %}
+        {% if show_submit %}
         <button type="submit" class="{{ btn_class }}">{{ action_text }} </button>
+        {% endif %}
     </form>
 {%- endmacro %}

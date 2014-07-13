@@ -1,10 +1,7 @@
 import datetime
 from flask import url_for
 from bitnotes import db
-
 from flask.ext.security import UserMixin, RoleMixin, MongoEngineUserDatastore
-
-
 
 class Role(db.Document, RoleMixin):
     name = db.StringField(max_length=80, unique=True)
@@ -146,6 +143,9 @@ class CommentBox(BitField):
 	comments = db.ListField(db.EmbeddedDocumentField('Comment'))
 	def __unicode__(self):
 		return self.title
+
+class CheckList(BitField):
+	items = db.SortedListField(db.DictField())
 
 def user_mail_context(from_user, to_user):
 		if not from_user.mail:
