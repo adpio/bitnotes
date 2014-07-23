@@ -1,7 +1,7 @@
 {% macro render_field_for_view(field) %}
-	<h2>{{ field.title }}</h2>
+<div>
 	{% if field.bit_field_type == 'BlogPost' %}
-
+	<h2>{{ field.title }}</h2>
 	<p>{{ field.body }}</p>
 
 	{% elif field.bit_field_type == 'Quote' %}
@@ -14,14 +14,14 @@
 
 	{% elif field.bit_field_type == 'Code' %}
 
-	<code><pre>{{ field.body }}sa fkasjdhf to do:</pre></code>
+	<code><pre>{{ field.body }}</pre></code>
 
 	{% elif field.bit_field_type == 'Image' %}
 
 	<img src="{{ field.image_url }}" class="img-responsive" alt="Responsive image">
 
 	{% elif field.bit_field_type == 'Rating' %}
-
+	<h2>{{ field.title }}</h2>
 	<input class="rating" data-max="5" data-min="1" id="{{ field.__hash__() }}Rating" name="rating_value" type="number" value="{{ field.rating_value }}" />
 	<input type="hidden" name="rating_scale" value="{{ field.rating_scale }}">
 
@@ -32,7 +32,34 @@
 	<footer><label>By: {{ comment.author.email }}</footer>
 	<hr>
 	{% endfor %}
+	{% elif field.bit_field_type == 'Video' %}
+	{{ field.embed_code|safe }}
+	{% elif field.bit_field_type == 'DataSeries' %}
+	<canvas id="LineChart" width="auto" height="auto"></canvas>
+		<script>
+			var lbls = ("{{field.data_points}}").split(",")
+			var data = {
+					    labels: ["one","two","three","four"],
+					    datasets: [
+					        {
+					            label: "My First dataset",
+					            fillColor: "rgba(220,220,220,0.2)",
+					            strokeColor: "rgba(220,220,220,1)",
+					            pointColor: "rgba(220,220,220,1)",
+					            pointStrokeColor: "#fff",
+					            pointHighlightFill: "#fff",
+					            pointHighlightStroke: "rgba(220,220,220,1)",
+					            data: [ {{ field.data_points }} ]
+					        }
+					    ]
+					};
+			var ctx = $("#LineChart").get(0).getContext("2d");
+			var LineChart = new Chart(ctx).Line(data);
+		</script>
+	{% elif field.bit_field_type == 'Link' %}
+	<a href="{{ field.link}}">{{ field.title }}</a>
 	{% endif %}
+</div>
 {% endmacro %}
 
 {% macro render_note_for_view(active_item, folder) %}
@@ -130,15 +157,17 @@
 				{% elif field.bit_field_type == 'Code' %}
 				<div class="form-group">
 					<label class="col-sm-2 control-label" for="{{ field.title }}">{{ field.title }}</label>
+					
 					<div class="col-sm-10">
-						<code><pre>{{ field.body }}sa fkasjdhf to do:</pre></code>
+					<input type="text" id="{{ field.title }}Code" type="text" class="form-control  autosubmit" name="body" value="{{ field.body }}">
+						<code><pre>{{ field.body }}</pre></code>
 					</div>
 				</div>
 				{% elif field.bit_field_type == 'Image' %}
 				<div class="form-group">
 					<label class="col-sm-2 control-label" for="{{ field.title }}Image">{{ field.title }}</label>
 					<div class="col-sm-10">
-						<input type="text" id="{{ field.title }}Image" type="text" class="form-control  autosubmit" name="image_url" value="{{ field.image_url }}">
+						<input type="text" id="{{ field.title }}Image" type="text" class="form-control autosubmit" name="image_url" value="{{ field.image_url }}">
 						<img src="{{ field.image_url }}" class="img-responsive" alt="Responsive image">
 					</div>
 				</div>
@@ -164,7 +193,56 @@
 						<input type="submit" class="btn btn-primary" value="Submit Comment">
 					</div>
 				</div>
+
+				{% elif field.bit_field_type == 'Video' %}
+				<div class="form-group">
+					<label class="col-sm-2 control-label" for="{{ field.title }}Link">{{ field.title }}</label>
+					<div class="col-sm-10">
+						<label class="col-sm-2 control-label" for="{{ field.title }}Link">Embedded Code</label>
+						<input type="text" name="embed_code" id="{{ field.title }}Link" class="form-control autosubmit">
+						{{ field.link|safe }}
+					</div>
+				</div>
+
+				{% elif field.bit_field_type == 'Link' %}
+				<div class="form-group">
+					<label class="col-sm-2 control-label" for="{{ field.title }}Link">{{ field.title }}</label>
+					<div class="col-sm-10">
+						<input type="text" name="link" id="{{ field.title }}Link" class="form-control autosubmit">
+						<a class="white" href="{{ field.link }}">{{field.link}}</a>
+					</div>
+				</div>
+				{% elif field.bit_field_type == 'DataSeries' %}
+				<div class="form-group">
+					<label class="col-sm-2 control-label" for="{{ field.title }}Data">{{ field.title }}</label>
+					<div class="col-sm-10">
+						<input type="text" name="data_points" id="{{ field.title }}Data" class="form-control autosubmit" value="{{field.data_points}}">
+						<canvas id="LineChart" width="auto" height="auto"></canvas>
+					</div>
+				</div>
+			
+				<script>
+					var lbls = ("{{field.data_points}}").split(",")
+					var data = {
+							    labels: ["one","two","three","four"],
+							    datasets: [
+							        {
+							            label: "My First dataset",
+							            fillColor: "rgba(220,220,220,0.2)",
+							            strokeColor: "rgba(220,220,220,1)",
+							            pointColor: "rgba(220,220,220,1)",
+							            pointStrokeColor: "#fff",
+							            pointHighlightFill: "#fff",
+							            pointHighlightStroke: "rgba(220,220,220,1)",
+							            data: [ {{ field.data_points }} ]
+							        }
+							    ]
+							};
+					var ctx = $("#LineChart").get(0).getContext("2d");
+					var LineChart = new Chart(ctx).Line(data);
+				</script>
 				{% endif %}
+
 			</form>
 			<form method="post" class="pull-right" action="field_manager">
 				<input type="hidden" name="task" value="delete">

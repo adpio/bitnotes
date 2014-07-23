@@ -1,6 +1,6 @@
 BitNotes
 ========
-#What the fuck is that?
+#What the f is that?
 BitNotes is the new way of storing, sending and sharing information.
 #Installation
 ##Use linux:
@@ -48,3 +48,8 @@ Edit debug.py to:
 debugging = True
 ```
 Leave \_\_init\_\_.py empty.
+#Run
+It's a flask app so:
+```sh
+python manage.py runserver
+```

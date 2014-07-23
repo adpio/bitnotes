@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% from "notes/_macros.html" import render_bitnote_for_editor %}
 {% block extra_head %}
-<script src="http://rawgit.com/javiertoledo/bootstrap-rating-input/master/build/bootstrap-rating-input.min.js"></script>
+	
 {% endblock %}
 
 {% block content %}
@@ -30,6 +30,7 @@
 				        <label><input type="checkbox" name="p" value="1">P</label>
 				      </div>
 				    </div>
+
 				</form>
 				<button class="btn btn-primary" id="send-mail-button" onclick="sendMail()">Send</button>
 			</div>
@@ -51,6 +52,8 @@
 					<div class="radio"><label><input type="radio" name="field_type"value="Image" checked>Image</label></div>
 					<div class="radio"><label><input type="radio" name="field_type"value="Code" checked>Code</label></div>
 					<div class="radio"><label><input type="radio" name="field_type"value="Video" checked>Video</label></div>
+					<div class="radio"><label><input type="radio" name="field_type"value="Link" checked>Link</label></div>
+					<div class="radio"><label><input type="radio" name="field_type"value="DataSeries" checked>DataSeries</label></div>
 					<input class="form-control" type="text" name="field_title" placeholder="enter unique field title">
 					<input type="submit" class="btn btn-primary" value="Add">
 				</form>

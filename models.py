@@ -126,7 +126,22 @@ class Rating(BitField):
 			return 0
 
 class Video(BitField):
-	embed_code = db.StringField(required=True)
+	embed_code = db.StringField(required=False)
+
+class Link(BitField):
+	link = db.StringField(max_length=255, required=False)
+
+class EmailList(BitField):
+	email_list = db.ListField(db.EmailField())
+
+class Number(BitField):
+	value = db.DecimalField()
+
+class DataSeries(BitField):
+	data_points = db.StringField(default='0')
+
+class Switch(BitField):
+	state = db.BooleanField(default=False) 
 
 class Image(BitField):
 	image_url = db.StringField(required=False, max_length=255)
@@ -145,7 +160,27 @@ class CommentBox(BitField):
 		return self.title
 
 class CheckList(BitField):
-	items = db.SortedListField(db.DictField())
+	items = db.StringField()
+
+#devices
+class Device(db.DynamicDocument):
+	name = db.StringField(required=True)
+	meta = {'allow_inheritance': True,}
+	
+
+class Availib(Device):
+	avil_from = db.DateTimeField(default=datetime.datetime.now, required=True)
+	avail_to = db.DateTimeField(required=False)
+	allowed_usrs = db.ListField(db.ReferenceField(User))
+	reservations = db.ListField(db.ReferenceField('Reservation'))
+
+class Reservation(db.EmbeddedDocument):
+	made_by = db.ReferenceField(User)
+	from_time = db.DateTimeField(default=datetime.datetime.now, required=True)
+	to_time = db.DateTimeField(required=True)
+
+	def check_avilability(self, fr, to):
+		f = Reservation.objects(from_time__lte = fr, to_time = to)
 
 def user_mail_context(from_user, to_user):
 		if not from_user.mail:
