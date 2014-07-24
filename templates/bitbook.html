@@ -7,53 +7,68 @@
 <h1>
 	{{ bitbook.title }}
 </h1>
+<p>{{ bitbook.description }}</p>
 <div class="btn-group">
 	<form method="post" action="note_manager">
-  <h3>Create more notes</h3>
+  <h4>Create more notes:</h4>
 		<input type="hidden" name="action" value="create">
 		<input type="submit" class="btn btn-sm btn-success" value="{{ bitbook.bitnotes|count }}+">
 	</form>
 	<!-- Modal Button -->
-  <h3>Edit this bitbook</h3>
-	<button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModal">
+  <h4>Edit this bitbook:</h4>
+	<button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#EditBitBookModal">
 	  Edit
 	</button>
+  <button class="btn btn-danger btn-sm" onclick="deleteBitBook('{{bitbook.id}}');">Delete BitBook</button>
 </div>
-<!-- Modal -->
-<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<!-- EditBitBookModal -->
+<div class="modal fade" id="EditBitBookModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog" style="position:static;">
     <div class="modal-content">
-    <form method="post" action="">
+    
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-        
-        <input type="text" class="modal-title" name="title" id="myModalLabel" value="{{ bitbook.title }}">
+      Edit this BitBook
+      <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            
       </div>
       <div class="modal-body">
-        <input type="text" class="modal-title" name="description" value="{{ bitbook.description }}">
+      <form class="form-horizontal" method="post" action="">
+        <div class="form-group">
+          <label class="col-sm-2 control-label">Description</label>
+          <div class="col-sm-10">
+          <input type="text" class="form-control" name="title" value="{{ bitbook.title }}">
+          </div>
+          <label class="col-sm-2 control-label" >Title</label>
+          <div class="col-sm-10">
+          <textarea style="resize:vertical" type="text" name="description" class="form-control">{{ bitbook.description }}</textarea>
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <input type="submit" class="btn btn-primary" value="Submit">
+          </div>
+        </div>
+      </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <input type="submit" class="btn btn-primary" value="Submit">
+      Miss Information
       </div>
-      </form>
+
     </div>
   </div>
 </div>
-<h3>BitBook Description</h3>
-<p>{{ bitbook.description }}</p>
-<h3>List of fields in this BitBook</h3>
+
+
+<h4>List of fields in this BitBook:</h4>
 <p>
 {% for field in bitbook.cover_fields %}
 <span class="label label-primary">{{ field }}</span>
 {% endfor %}
 </p>
-<h3>List of BitNotes</h3>
+<h4>List of BitNotes:
+</h4>
 <div class="list-group">
 {% for note in bitbook.bitnotes %}
   <a href="{{ url_for('posts.bitbook', bitbook_id=bitbook.id) }}?active={{ note.id }}" class="list-group-item {% if note.id == active.id %}active{% endif %}">
-    <h4 class="list-group-item-heading">{{ note.created_at.strftime('%Y %m %d (%H:%M)') }}</h4>
-    <p class="list-group-item-text">{{note.title}}</p>
+    <h5 class="list-group-item-heading">{{note.title}}</h5>
+    <small class="list-group-item-text">{{ note.created_at.strftime('%Y %m %d (%H:%M)') }}</small>
   </a>
 {% endfor %}
 </div>
@@ -83,4 +98,16 @@
 {% endif %}
 </div>
 
+
+<!-- Scripts -->
+<script>
+  function deleteBitBook(bitbook){
+    if (confirm('Are you sure?') == true){
+    $.ajax({
+      type: "DELETE",
+      url: "/"+bitbook+"/",
+      success: window.location.replace("/")
+    })}
+  }
+</script>
 {% endblock %}

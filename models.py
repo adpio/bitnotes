@@ -3,6 +3,7 @@ from flask import url_for
 from bitnotes import db
 from flask.ext.security import UserMixin, RoleMixin, MongoEngineUserDatastore
 
+
 class Role(db.Document, RoleMixin):
     name = db.StringField(max_length=80, unique=True)
     description = db.StringField(max_length=255)
@@ -17,6 +18,7 @@ class User(db.Document, UserMixin):
     mail = db.ReferenceField('BitMail')
 
 user_datastore = MongoEngineUserDatastore(db, User, Role)
+
 
 class BitMailItem(db.Document):
 	bitnote = db.ReferenceField('BitNote')
@@ -91,7 +93,7 @@ class BitBook(db.DynamicDocument):
 	description = db.StringField(required=False)
 	created_at = db.DateTimeField(default=datetime.datetime.now, required=True)
 	cover_fields = db.DictField(required=False)
-	bitnotes = db.ListField(db.ReferenceField(BitNote))
+	bitnotes = db.ListField(db.ReferenceField(BitNote, reverse_delete_rule=db.PULL))
 	thumbnail = db.ImageField(size=(800, 600, True), thumbnail_size=(150,150,True))
 
 	def share_to(self, to_user, from_user, msg, access):
@@ -106,6 +108,8 @@ class BitBook(db.DynamicDocument):
 		fr.mail.outbox.append(message)
 		fr.mail.save()
 
+#haxxor
+BitBook.register_delete_rule(User, 'bitbooks', db.PULL)
 
 
 class BlogPost(BitField):
@@ -130,6 +134,11 @@ class Video(BitField):
 
 class Link(BitField):
 	link = db.StringField(max_length=255, required=False)
+	og_url = db.StringField(max_length=255, required=False)
+	og_type = db.StringField(max_length=255, required=False)
+	og_image = db.StringField(max_length=255, required=False)
+	og_title = db.StringField(max_length=255, required=False)
+	og_description = db.StringField(required=False)
 
 class EmailList(BitField):
 	email_list = db.ListField(db.EmailField())

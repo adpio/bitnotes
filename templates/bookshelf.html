@@ -21,17 +21,20 @@
 
   <div class="col-sm-9">
     {% for book in bitbooks %}
-    <div style="margin-bottom:2em;" class="col-sm-4">
+    <div id="{{ book.id }}" style="margin-bottom:2em;" class="col-sm-4">
       <div class="thumbnail">
         <div class="caption">
-          <div class="pull-right"><span class="glyphicon glyphicon-send" style="cursor:pointer;" onclick="showMailModal('{{book.id}}');" data-toggle="tooltip" data-placement="left" title="send to email"></div>
+          <div class="pull-right">
+          <span class="glyphicon glyphicon-send" style="cursor:pointer;" onclick="showMailModal('{{book.id}}');" data-toggle="tooltip" data-placement="left" title="send to email"></span>
+          <span class="glyphicon glyphicon-trash" style="cursor:pointer;" onclick="deleteBitBook('{{book.id}}');" data-toggle="tooltip" data-placement="left" title="delete bitbook"></span>
+          <span class="glyphicon glyphicon-edit" style="cursor:pointer;" onclick="showEditBitBookModal('{{book.id}}');" data-toggle="tooltip" data-placement="left" title="edit bitbook"></span>
+          </div>
           <h3>{{ book.title }}</h3>
           <p>{{ book.description }}</p>
-          <p>
+          
             <a href="{{ url_for('posts.bitbook', bitbook_id=book.id) }}" class="btn btn-primary" role="button">Open</a>
             <!-- Button trigger modal -->
-            
-          </p>
+          
         </div>
       </div>
     </div>
@@ -51,7 +54,7 @@
 {% endblock %}
 {% block extra_body %}
 
-<!-- Modal -->
+<!-- MailModal -->
 <div class="modal fade" id="MailModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog" style="position:static;">
     <div class="modal-content">
@@ -77,7 +80,7 @@
                 <label><input type="checkbox" name="e" value="1">Editor</label>
                 <label><input type="checkbox" name="v" value="1">Viewer</label>
                 <label><input type="checkbox" name="p" value="1">Public</label>
-              <input type="submit">
+                </div>
               </form>
             </div>
             <button class="btn btn-primary" id="send-mail-button" onclick="sendMail()">Send</button>
@@ -93,11 +96,63 @@
     </div>
   </div>
 </div>
+<!-- EditBitBookModal -->
+<div class="modal fade" id="EditBitBookModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog" style="position:static;">
+    <div class="modal-content">
+    
+      <div class="modal-header">
+      Edit this BitBook
+      <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+      </div>
+      <div class="modal-body">
+      <form class="form-horizontal" id="modalForm" method="post" action="">
+        <div class="form-group">
+          <label class="col-sm-2 control-label">Description</label>
+          <div class="col-sm-10">
+          <input type="text" class="form-control" id="modalFormTitle" name="title" value="">
+          </div>
+          <label class="col-sm-2 control-label" >Title</label>
+          <div class="col-sm-10">
+          <textarea style="resize:vertical" id="modalFormDescription" type="text" name="description" class="form-control"></textarea>
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <input type="submit" class="btn btn-primary" value="Submit">
+          </div>
+        </div>
+      </form>
+      </div>
+      <div class="modal-footer">
+      Miss Information
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+
 <script>
   function showMailModal(bitbook){
     $('#mailer-bb-id').val(bitbook);
     $('#MailModal').modal('show');
   };
+  function showEditBitBookModal(b_id){
+    var title = $("#"+b_id).find("h3").html();
+    var description = $("#"+b_id).find("p").html();
+    $("#modalForm").attr("action", "/"+b_id+"/");
+    $("#modalFormTitle").val(title);
+    $("#modalFormDescription").html(description);
+    $("#EditBitBookModal").modal("show");
+
+  }
+  function deleteBitBook(bitbook){
+    if (confirm('Are you sure?') == true){
+    $.ajax({
+      type: "DELETE",
+      url: "/"+bitbook+"/",
+      success: location.reload()
+    })}
+  }
   function sendMail(){
     $("#send-mail-button").prop("disabled", true).html("sending ... ");
     $.ajax({

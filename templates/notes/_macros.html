@@ -33,7 +33,9 @@
 	<hr>
 	{% endfor %}
 	{% elif field.bit_field_type == 'Video' %}
+	<div class="embed-responsive embed-responsive-16by9">
 	{{ field.embed_code|safe }}
+	</div>
 	{% elif field.bit_field_type == 'DataSeries' %}
 	<canvas id="LineChart" width="auto" height="auto"></canvas>
 		<script>
@@ -57,7 +59,20 @@
 			var LineChart = new Chart(ctx).Line(data);
 		</script>
 	{% elif field.bit_field_type == 'Link' %}
-	<a href="{{ field.link}}">{{ field.title }}</a>
+	<div class="row">
+		<div class="col-md-3 col-xs-2">
+			<a class="thumbnail" href="{{ field.og_url }}">
+
+			<img class="media-object" src="{{ field.og_image }}" alt="{{ field.og_title }}">
+			</a>
+		</div>
+		<div class="col-md-9 col-xs-10">
+			<div class="media-body">
+			<h4 class="media-heading">{{ field.og_title }}</h4>
+			{{ field.og_description }}
+			</div>
+		</div>
+	</div>
 	{% endif %}
 </div>
 {% endmacro %}
@@ -200,7 +215,9 @@
 					<div class="col-sm-10">
 						<label class="col-sm-2 control-label" for="{{ field.title }}Link">Embedded Code</label>
 						<input type="text" name="embed_code" id="{{ field.title }}Link" class="form-control autosubmit" value="{{ field.embed_code }}">
+						<div class="embed-responsive embed-responsive-16by9">
 						{{ field.embed_code|safe }}
+						</div>
 					</div>
 				</div>
 
@@ -208,8 +225,21 @@
 				<div class="form-group">
 					<label class="col-sm-2 control-label" for="{{ field.title }}Link">{{ field.title }}</label>
 					<div class="col-sm-10">
-						<input type="text" name="link" id="{{ field.title }}Link" class="form-control autosubmit">
-						<a class="white" href="{{ field.link }}">{{field.link}}</a>
+						<input type="text" name="link" id="{{ field.title }}Link" class="form-control autosubmit" value="{{ field.link }}">
+						<div class="row">
+							<div class="col-md-3 col-xs-2">
+								<a class="thumbnail" href="{{ field.og_url }}">
+
+								<img class="media-object" src="{{ field.og_image }}" alt="{{ field.og_title }}">
+								</a>
+							</div>
+							<div class="col-md-9 col-xs-10">
+								<div class="media-body">
+								<h4 class="media-heading">{{ field.og_title }}</h4>
+								{{ field.og_description }}
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
 				{% elif field.bit_field_type == 'DataSeries' %}
