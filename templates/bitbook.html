@@ -9,10 +9,12 @@
 </h1>
 <div class="btn-group">
 	<form method="post" action="note_manager">
+  <h3>Create more notes</h3>
 		<input type="hidden" name="action" value="create">
 		<input type="submit" class="btn btn-sm btn-success" value="{{ bitbook.bitnotes|count }}+">
 	</form>
 	<!-- Modal Button -->
+  <h3>Edit this bitbook</h3>
 	<button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModal">
 	  Edit
 	</button>
@@ -38,16 +40,15 @@
     </div>
   </div>
 </div>
-
+<h3>BitBook Description</h3>
 <p>{{ bitbook.description }}</p>
+<h3>List of fields in this BitBook</h3>
 <p>
 {% for field in bitbook.cover_fields %}
 <span class="label label-primary">{{ field }}</span>
 {% endfor %}
 </p>
-
-
-
+<h3>List of BitNotes</h3>
 <div class="list-group">
 {% for note in bitbook.bitnotes %}
   <a href="{{ url_for('posts.bitbook', bitbook_id=bitbook.id) }}?active={{ note.id }}" class="list-group-item {% if note.id == active.id %}active{% endif %}">
