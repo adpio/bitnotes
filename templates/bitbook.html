@@ -8,18 +8,14 @@
 	{{ bitbook.title }}
 </h1>
 <p>{{ bitbook.description }}</p>
-<div class="btn-group">
-	<form method="post" action="note_manager">
-  <h4>Create more notes:</h4>
-		<input type="hidden" name="action" value="create">
-		<input type="submit" class="btn btn-sm btn-success" value="{{ bitbook.bitnotes|count }}+">
-	</form>
+<div class="btn-group btn-xs">
+  <button class="btn btn-success" value="{{ bitbook.bitnotes|count }}+" onclick="createBitNote()">{{ bitbook.bitnotes|count }}+Add</button>
 	<!-- Modal Button -->
-  <h4>Edit this bitbook:</h4>
-	<button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#EditBitBookModal">
+
+	<button class="btn btn-primary" data-toggle="modal" data-target="#EditBitBookModal">
 	  Edit
 	</button>
-  <button class="btn btn-danger btn-sm" onclick="deleteBitBook('{{bitbook.id}}');">Delete BitBook</button>
+  <button class="btn btn-danger" style="display:inline-block;" onclick="deleteBitBook('{{bitbook.id}}');">Delete</button>
 </div>
 <!-- EditBitBookModal -->
 <div class="modal fade" id="EditBitBookModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -77,10 +73,11 @@
 <div class="col-sm-8">
 <div class="panel panel-default">
 <div class="panel-heading">
-<a  href="{{ url_for('posts.bitnote', bitbook_id=bitbook.id, bitnote_id=active.id ) }}">{{ active.title }}
-	<span class="glyphicon glyphicon-indent-left  pull-right" data-toggle="tooltip" data-placement="top" title="You can see this"></span>
-
+<a  href="{{ url_for('posts.bitnote', bitbook_id=bitbook.id, bitnote_id=active.id ) }}">
+	<span class="glyphicon glyphicon-indent-left " data-toggle="tooltip" data-placement="left" title="Edit"></span>
+  {{ active.title }}
 </a>
+<span class="glyphicon glyphicon-trash red pull-right" data-toggle="tooltip" data-placement="right" title="Delete this note" onclick="deleteBitNote('{{ active.id }}');"></span>
 
 </div>
 <div class="panel-body">
@@ -106,8 +103,26 @@
     $.ajax({
       type: "DELETE",
       url: "/"+bitbook+"/",
-      success: window.location.replace("/")
+      success: function(response){
+        window.location.href = response;
+      }
     })}
+  }
+  function deleteBitNote(bitnote){
+    $.ajax({
+      type: "DELETE",
+      url: "/{{bitbook.id}}/"+bitnote+"/",
+      success: location.reload()
+    })
+  }
+  function createBitNote(){
+    $.ajax({
+      type: "PUT",
+      url: "/"+"{{bitbook.id}}"+"/",
+      success: function(response){
+        window.location.href = response;
+      }
+    })
   }
 </script>
 {% endblock %}

@@ -60,13 +60,13 @@
 		</script>
 	{% elif field.bit_field_type == 'Link' %}
 	<div class="row">
-		<div class="col-md-3 col-xs-2">
+		<div class="col-md-3 col-xs-5">
 			<a class="thumbnail" href="{{ field.og_url }}">
 
 			<img class="media-object" src="{{ field.og_image }}" alt="{{ field.og_title }}">
 			</a>
 		</div>
-		<div class="col-md-9 col-xs-10">
+		<div class="col-md-9 col-xs-7">
 			<div class="media-body">
 			<h4 class="media-heading">{{ field.og_title }}</h4>
 			{{ field.og_description }}
@@ -134,15 +134,16 @@
 	<script>$("[data-toggle=tooltip]").tooltip()</script>
 {% endmacro %}
 
-{% macro render_bitnote_for_editor(note, unused_bitfields) %}
+{% macro render_bitnote_for_editor(note, unused_bitfields, bitbook) %}
 	<div class="panel panel-primary">
 		<div class="panel-heading">
-			<form role="form" method="post" class="form-horizontal" id="HeadingForm" >
+
+			<form role="form" style="display:inline-block;" method="post" class="form-horizontal" id="HeadingForm" >
 				<input type="hidden" name="field_title" value="Heading">
 				<input type="hidden" name="field_type" value="Heading">
 				<input style="background-color:inherit; color:inherit; border:none;" name="Heading" id="Heading" class="form-control autosubmit" type="text" value="{{ note.title }}">
 			</form>
-
+			<span class="glyphicon glyphicon-trash red pull-right" data-toggle="tooltip" data-placement="right" title="Delete this note" onclick="deleteBitNote();"></span>
 		</div>
 		<div class="panel-body">
 
@@ -227,13 +228,13 @@
 					<div class="col-sm-10">
 						<input type="text" name="link" id="{{ field.title }}Link" class="form-control autosubmit" value="{{ field.link }}">
 						<div class="row">
-							<div class="col-md-3 col-xs-2">
+							<div class="col-md-3 col-xs-5">
 								<a class="thumbnail" href="{{ field.og_url }}">
 
 								<img class="media-object" src="{{ field.og_image }}" alt="{{ field.og_title }}">
 								</a>
 							</div>
-							<div class="col-md-9 col-xs-10">
+							<div class="col-md-9 col-xs-7">
 								<div class="media-body">
 								<h4 class="media-heading">{{ field.og_title }}</h4>
 								{{ field.og_description }}
@@ -308,6 +309,14 @@ $(".autosubmit").on("keypress change cut paste", function () {
 	var f = $(this).closest("form")
 	submitIt(f);
 })
+
+function deleteBitNote(){
+$.ajax({
+		type: "DELETE",
+		url: "/{{bitbook.id}}/{{note.id}}/",
+		success: window.location.href = "/{{bitbook.id}}/"
+		})
+}
 </script>
 
 {% endmacro %}

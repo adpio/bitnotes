@@ -196,6 +196,16 @@ class BitBookView(MethodView):
 		flash(u'BitBook deleted', 'danger')
 		return redirect(url_for('posts.bitbooks'))
 
+	@login_required
+	def put(self, bitbook_id):
+		bitbook = BitBook.objects.get_or_404(id=bitbook_id)
+		note = BitNote()
+		#note.bitfields.append(bitbook.cover_fields.values())
+		note.save()
+		bitbook.bitnotes.append(note)
+		bitbook.save()
+		return '/%s/%s'%(bitbook.id, note.id)
+
 class BitNoteView(MethodView):
 
 	def get_context(self, bitbook_id, bitnote_id):
@@ -249,19 +259,14 @@ class BitNoteView(MethodView):
 					form.populate_obj(field)
 				note.save()
 
-		return render_template('notes/note.html', note=note, bitbook=bitbook, unused_bitfields=unused_bitfields)       
+		return render_template('notes/note.html', note=note, bitbook=bitbook, unused_bitfields=unused_bitfields)
 
-class BitNoteManager(MethodView):
-	def post(self, bitbook_id):
-		bitbook = BitBook.objects.get_or_404(id=bitbook_id)
-		action = request.form['action']
-		if action == 'create':
-			note = BitNote()
-			#note.bitfields.append(bitbook.cover_fields.values())
-			note.save()
-			bitbook.bitnotes.append(note)
-			bitbook.save()
-			return redirect(url_for('posts.bitnote', bitbook_id=bitbook.id, bitnote_id=note.id))
+	@login_required
+	def delete(self, bitbook_id, bitnote_id):
+		note = BitNote.objects.get_or_404(id=bitnote_id)
+		note.delete()
+		flash(u'BitNote deleted', 'danger')
+		return '/%s/%s'%(bitbook.id)
 
 
 class FieldManager(MethodView):
@@ -302,59 +307,15 @@ class FieldManager(MethodView):
 		return redirect(url_for('posts.bitnote', bitbook_id=bitbook_id, bitnote_id = note.id))
 
 
-
-class ListView(MethodView):
-	def get(self):
-		posts = Post.objects.all()
-		return render_template('posts/list.html', posts=posts)
-
-
-class DetailView(MethodView):
-
-	form = model_form(Comment, exclude=['created_at'])
-
-	def get_context(self, slug):
-		post = Post.objects.get_or_404(slug=slug)
-		form = self.form(request.form)
-
-		context = {
-			"post": post,
-			"form": form
-		}
-		return context
-
-	def get(self, slug):
-		context = self.get_context(slug)
-		return render_template('posts/detail.html', **context)
-
-	def post(self, slug):
-		context = self.get_context(slug)
-		form = context.get('form')
-
-		if form.validate():
-			comment = Comment()
-			form.populate_obj(comment)
-
-			post = context.get('post')
-			post.comments.append(comment)
-			post.save()
-
-			return redirect(url_for('posts.detail', slug=slug))
-		return render_template('posts/detail.html', **context)
-
 @posts.errorhandler(404)
 def page_not_found(e):
     return render_template('errors/404.html')
 
 # Register the urls
-#posts.add_url_rule('/', view_func=ListView.as_view('list'))
-#posts.add_url_rule('/<slug>/', view_func=DetailView.as_view('detail'))
 posts.add_url_rule('/<bitbook_id>/', view_func=BitBookView.as_view('bitbook'))
-#posts.add_url_rule('/bn/<bitnote_id>/',view_func=BitNoteView.as_view('bitnote'))
 posts.add_url_rule('/<bitbook_id>/<bitnote_id>/field_manager',view_func=FieldManager.as_view('field_manager'))
 posts.add_url_rule('/', view_func=BitBookShelf.as_view('bitbooks'))
 posts.add_url_rule('/<bitbook_id>/<bitnote_id>/', view_func=BitNoteView.as_view('bitnote'))
-posts.add_url_rule('/<bitbook_id>/note_manager', view_func=BitNoteManager.as_view('bitnote_manager'))
 posts.add_url_rule('/mailer/', view_func=Mailer.as_view('mailer'))
 posts.add_url_rule('/mail/<folder>/', view_func=MailBox.as_view('mail'))
 posts.add_url_rule('/mail/<folder>/<bitmail_id>/<action>', view_func=MailHandler.as_view('mail_handler'))

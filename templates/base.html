@@ -44,15 +44,23 @@
           <ul class="nav navbar-nav">
             {% if bitbook is defined %}
             <li>         
-              <a href="/{{ bitbook.id }}">: {{bitbook.title}}</a>
+              <a href="/{{ bitbook.id }}" style="word-spacing: -0.7em;"><span class="glyphicon glyphicon-book" style="font-size:1em;" data-toggle="tooltip" data-placement="bottom" title="{{bitbook.id}}"> {{bitbook.title}}</a>
             </li>
+            {% endif %}
+            {% if note is defined %}
+            <li>
+              <a class="dropdown-toggle" style="word-spacing: -0.7em;" data-toggle="dropdown" href="#" id="themes"><span style="font-size:1em;" class="glyphicon glyphicon-list-alt" data-toggle="tooltip" data-placement="bottom" title="{{note.id}}"> {{ note.title }}</a>
+
+            </li>
+
+
             {% endif %}
 
           </ul>
 
           <ul class="nav navbar-nav navbar-right">
             <li class="dropdown">
-              <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="themes">{{ current_user.email }}<span class="caret"></span></a>
+              <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="themes">{{ current_user.email }}<span class="badge">{{ current_user.mail.inbox|count }}</span><span class="caret"></span></a>
               <ul class="dropdown-menu" aria-labelledby="themes">
                 <li><a href="{{ url_for('posts.mail', folder='inbox') }}">Mail</a></li>
                 <li class="divider"></li>
