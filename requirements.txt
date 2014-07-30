@@ -9,3 +9,4 @@ flask-mail
 flask-debugtoolbar
 PIL
 opengraph
+geopy

@@ -6,8 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>BitNotes</title>
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
-
-    <link rel="stylesheet" type="text/css" href="http://sitediscount.ru/glossy_blue_theme/css/theme.css">
+    
+    <!-- <link rel="stylesheet" type="text/css" href="http://sitediscount.ru/glossy_blue_theme/css/theme.css"> -->
+    <link rel="stylesheet" type="text/css" href="http://bootswatch.com/darkly/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='pace.css') }}">
     <link href="{{ url_for('static', filename='favicon.ico') }}" rel="icon" type="image/x-icon" />
     <style>.content {padding-top: 80px;} a.brand {color: #fff } span.glyphicon {font-size: 1.2em;}</style>
@@ -55,13 +56,14 @@
 
 
             {% endif %}
-
+            {% block extra_topbar %}
+            {% endblock %}
           </ul>
           {% if current_user.is_authenticated() %}
           <ul class="nav navbar-nav navbar-right">
             <li class="dropdown">
 
-              <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="themes">{{ current_user.email }}<span class="badge">{{ current_user.mail.inbox|count }}</span><span class="caret"></span></a>
+              <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="themes">{{ current_user.email }} <span class="badge">{{ current_user.mail.inbox|count }}</span><span class="caret"></span></a>
               <ul class="dropdown-menu" aria-labelledby="themes">
                 <li><a href="{{ url_for('posts.mail', folder='inbox') }}">Mail</a></li>
                 <li class="divider"></li>

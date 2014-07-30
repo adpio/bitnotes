@@ -103,9 +103,8 @@
     $.ajax({
       type: "DELETE",
       url: "/"+bitbook+"/",
-      success: function(response){
-        window.location.href = response;
-      }
+      success: window.location.replace('/')
+      
     })}
   }
   function deleteBitNote(bitnote){

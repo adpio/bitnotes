@@ -13,6 +13,7 @@ from wtforms import Form
 from wtforms import TextField, BooleanField, HiddenField, TextField, TextAreaField
 from wtforms.validators import DataRequired, Email
 import opengraph
+from geopy.geocoders import Nominatim
 
 
 posts = Blueprint('posts', __name__, template_folder='templates')
@@ -149,6 +150,7 @@ class BitBookShelf(MethodView):
 	@login_required
 	def get(self):
 		context = self.get_context()
+		context['bit_pub'] = BitBook.objects(public=True)[:4]
 		return render_template('bookshelf.html', **context)
 
 	@login_required
@@ -252,6 +254,12 @@ class BitNoteView(MethodView):
 							field.og_image = l.image
 							if 'description' in l.keys():
 								field.og_description = l.description
+				elif field_type == 'Location':
+					geolocator = Nominatim()
+					a = request.form['address']
+					l = geolocator.geocode(a)
+					field.location = [l.latitude, l.longitude]
+					field.addr = l.address
 				else:
 					constructor = globals()[field_type]
 					mform = model_form(constructor, exclude=['created_at','title'])

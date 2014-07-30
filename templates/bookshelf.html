@@ -4,51 +4,71 @@
 {% block extra_head %}
 <style type="text/css">
   .caption p{
-   line-height:1.2em; 
-   height:3.6em;
+   line-height:1em; 
+   height:3em;
    overflow:hidden;
  }
- .caption h3{
+ .caption h4{
    line-height:1.2em; 
-   height:1.2em;
+   height:2.4em;
    overflow:hidden;
  }
 
 </style>
 {% endblock %}
+{% block extra_topbar %}
+<li>
+<a class="dropdown-toggle" style="word-spacing: -0.7em;" href="#"><span style="font-size:1em;" class="glyphicon glyphicon-plus" data-toggle="tooltip" data-placement="bottom" title="add new BitBook" onclick="showAddBitBookModal();"> New BitBook</a>
+</li>
+{% endblock %}
 {% block content %}
 <div class="row">
-
-  <div class="col-sm-9">
-    {% for book in bitbooks %}
-    <div id="{{ book.id }}" style="margin-bottom:2em;" class="col-sm-4">
+  <div class="col-sm-12 well">
+  <h3>Public BitBooks</h3>
+    {% for book in bit_pub %}
+    <div id="{{ book.id }}" style="margin-bottom:2em;" class="col-sm-3">
       <div class="thumbnail">
         <div class="caption">
+
+          <h4>{{ book.title }}</h4>
+          <p>{{ book.description }}</p>
+          
+            <a href="{{ url_for('posts.bitbook', bitbook_id=book.id) }}" class="btn btn-primary" role="button">Open</a>
+            <!-- Button trigger modal -->
           <div class="pull-right">
           <span class="glyphicon glyphicon-send" style="cursor:pointer;" onclick="showMailModal('{{book.id}}');" data-toggle="tooltip" data-placement="left" title="send to email"></span>
           <span class="glyphicon glyphicon-trash" style="cursor:pointer;" onclick="deleteBitBook('{{book.id}}');" data-toggle="tooltip" data-placement="left" title="delete bitbook"></span>
           <span class="glyphicon glyphicon-edit" style="cursor:pointer;" onclick="showEditBitBookModal('{{book.id}}');" data-toggle="tooltip" data-placement="left" title="edit bitbook"></span>
           </div>
-          <h3>{{ book.title }}</h3>
-          <p>{{ book.description }}</p>
-          
-            <a href="{{ url_for('posts.bitbook', bitbook_id=book.id) }}" class="btn btn-primary" role="button">Open</a>
-            <!-- Button trigger modal -->
           
         </div>
       </div>
     </div>
     {% endfor %}
   </div>
-  <div class="col-sm-3">
-    <div class="panel panel-success">
-      <div class="panel-heading">
-        Create new BitBook
-      </div>
-      <div class="panel-body">
-      {{ render_form(form, action_url='', action_text='Submit Form') }}
+  </div>
+  <div class="row">
+  <div class="col-sm-12">
+    {% for book in bitbooks %}
+    <div id="{{ book.id }}" style="margin-bottom:2em;" class="col-sm-3">
+      <div class="thumbnail">
+        <div class="caption">
+
+          <h4>{{ book.title }}</h4>
+          <p>{{ book.description }}</p>
+          
+            <a href="{{ url_for('posts.bitbook', bitbook_id=book.id) }}" class="btn btn-primary" role="button">Open</a>
+
+          <div class="pull-right">
+          <span class="glyphicon glyphicon-send" style="cursor:pointer;" onclick="showMailModal('{{book.id}}');" data-toggle="tooltip" data-placement="left" title="send to email"></span>
+          <span class="glyphicon glyphicon-trash" style="cursor:pointer;" onclick="deleteBitBook('{{book.id}}');" data-toggle="tooltip" data-placement="left" title="delete bitbook"></span>
+          <span class="glyphicon glyphicon-edit" style="cursor:pointer;" onclick="showEditBitBookModal('{{book.id}}');" data-toggle="tooltip" data-placement="left" title="edit bitbook"></span>
+          </div>
+          
+        </div>
       </div>
     </div>
+    {% endfor %}
   </div>
 </div>
 {% endblock %}
@@ -89,9 +109,10 @@
             Message sent!
           </div>
         </div>
-      </div>
+      
       <div class="modal-footer">
-        Information
+        Miss Information
+      </div>
       </div>
     </div>
   </div>
@@ -128,7 +149,24 @@
     </div>
   </div>
 </div>
-
+<!-- AddBitBookModal -->
+<div class="modal fade" id="AddBitBookModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog" style="position:static;">
+    <div class="modal-content">
+    
+      <div class="modal-header">
+      Create new BitBook
+      <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+      </div>
+      <div class="modal-body">
+        {{ render_form(form, action_url='', action_text='Submit Form') }}
+      </div>
+      <div class="modal-footer">
+      Miss Information
+      </div>
+    </div>
+  </div>
+</div>
 
 
 <script>
@@ -143,7 +181,9 @@
     $("#modalFormTitle").val(title);
     $("#modalFormDescription").html(description);
     $("#EditBitBookModal").modal("show");
-
+  }
+  function showAddBitBookModal(){
+    $('#AddBitBookModal').modal('show');
   }
   function deleteBitBook(bitbook){
     if (confirm('Are you sure?') == true){

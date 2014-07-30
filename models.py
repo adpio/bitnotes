@@ -140,6 +140,13 @@ class Link(BitField):
 	og_title = db.StringField(max_length=255, required=False)
 	og_description = db.StringField(required=False)
 
+class LinkList(BitField):
+	linklist = db.ListField(db.ReferenceField('Link'))
+
+class Location(BitField):
+	addr = db.StringField(required=False, max_length=255)
+	location = db.GeoPointField(required=False)
+
 class EmailList(BitField):
 	email_list = db.ListField(db.EmailField())
 
