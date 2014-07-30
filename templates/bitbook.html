@@ -85,6 +85,8 @@
 {% for field in active.bitfields %}
 {{ render_field_for_view(field) }}
 {% endfor %}
+<br />
+<div style="background-color:white;padding:10px;" id="qr_code"></div>
 
 </div>
 <div class="panel-footer">
@@ -123,5 +125,11 @@
       }
     })
   }
+  $("#qr_code").qrcode({
+  width: 250 ,
+  height: 250,
+  text: window.location.href+"{{ active.id }}",
+  background: "fff"
+  });
 </script>
 {% endblock %}

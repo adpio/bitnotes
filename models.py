@@ -141,7 +141,7 @@ class Link(BitField):
 	og_description = db.StringField(required=False)
 
 class LinkList(BitField):
-	linklist = db.ListField(db.ReferenceField('Link'))
+	linklist = db.ListField(db.ReferenceField('Link'), required=False)
 
 class Location(BitField):
 	addr = db.StringField(required=False, max_length=255)
