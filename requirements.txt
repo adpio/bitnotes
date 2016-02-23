@@ -7,6 +7,6 @@ flask-login
 flask-security
 flask-mail
 flask-debugtoolbar
-PIL
+Pillow
 opengraph
 geopy
