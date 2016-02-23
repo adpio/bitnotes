@@ -8,7 +8,7 @@
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
     
     <!-- <link rel="stylesheet" type="text/css" href="http://sitediscount.ru/glossy_blue_theme/css/theme.css"> -->
-    <link rel="stylesheet" type="text/css" href="http://bootswatch.com/darkly/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="http://bootswatch.com/simplex/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/pace.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap-switch.min.css') }}">
     <link href="{{ url_for('static', filename='favicon.ico') }}" rel="icon" type="image/x-icon" />
@@ -65,7 +65,7 @@
             {% block extra_topbar %}
             {% endblock %}
           </ul>
-          {% if current_user.is_authenticated() %}
+          {% if current_user.is_authenticated %}
           <ul class="nav navbar-nav navbar-right">
             <li class="dropdown">
 

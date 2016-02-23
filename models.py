@@ -178,6 +178,9 @@ class CommentBox(BitField):
 class CheckList(BitField):
 	items = db.StringField()
 
+class File(BitField):
+	f = db.FileField
+
 #devices
 class Device(db.DynamicDocument):
 	name = db.StringField(required=True)

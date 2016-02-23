@@ -10,7 +10,7 @@ from flask_login import current_user
 from utils import send_mail
 #forms
 from wtforms import Form
-from wtforms import TextField, BooleanField, HiddenField, TextField, TextAreaField
+from wtforms import TextField, BooleanField, HiddenField, TextField, TextAreaField, FileField
 from wtforms.validators import DataRequired, Email
 import opengraph
 from geopy.geocoders import Nominatim

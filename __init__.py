@@ -2,6 +2,7 @@ from flask import Flask
 from flask.ext.mongoengine import MongoEngine
 from flask_debugtoolbar import DebugToolbarExtension
 from flask.ext.mail import Mail
+from bitnotes.extensions import *
 #utf8 workaround
 import sys  
 reload(sys)  
