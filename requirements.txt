@@ -10,3 +10,4 @@ flask-debugtoolbar
 Pillow
 opengraph
 geopy
+summary-extraction
