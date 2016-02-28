@@ -250,10 +250,14 @@ class BitNoteView(MethodView):
 
 						s = summary.Summary(link)
 						s.extract()
-						field.og_url = s.url
-						field.og_title = s.title
-						field.og_image = s.image.url
-						field.og_description = s.description
+						if s.url:
+							field.og_url = s.url
+						if s.title:
+							field.og_title = s.title
+						if s.image.url:
+							field.og_image = s.image.url
+						if s.description:
+							field.og_description = s.description
 
 						# l = opengraph.OpenGraph(url=link)
 						# if l.is_valid():
