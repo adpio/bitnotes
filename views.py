@@ -248,20 +248,20 @@ class BitNoteView(MethodView):
 						link = request.form['link']
 						field.link = link
 
-						s = summary.Summary(link).extract()
-							field.og_url = s.url
-							field.og_title = s.title
-							field.og_image = s.image
-							field.og_description = s.description
+						# s = summary.Summary(link).extract()
+						# 	field.og_url = s.url
+						# 	field.og_title = s.title
+						# 	field.og_image = s.image
+						# 	field.og_description = s.description
 
-						# l = opengraph.OpenGraph(url=link)
-						# if l.is_valid():
-						# 	field.og_url = l.url
-						# 	field.og_title = l.title
-						# 	field.og_type = l.type
-						# 	field.og_image = l.image
-						# 	if 'description' in l.keys():
-						# 		field.og_description = l.description
+						l = opengraph.OpenGraph(url=link)
+						if l.is_valid():
+							field.og_url = l.url
+							field.og_title = l.title
+							field.og_type = l.type
+							field.og_image = l.image
+							if 'description' in l.keys():
+								field.og_description = l.description
 				elif field_type == 'Location':
 					geolocator = Nominatim()
 					a = request.form['address']
