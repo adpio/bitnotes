@@ -254,7 +254,7 @@ class BitNoteView(MethodView):
 							field.og_url = s.url
 						if s.title:
 							field.og_title = s.title
-						if s.image.url:
+						if s.image:
 							field.og_image = s.image.url
 						if s.description:
 							field.og_description = s.description
