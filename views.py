@@ -14,7 +14,7 @@ from wtforms import TextField, BooleanField, HiddenField, TextField, TextAreaFie
 from wtforms.validators import DataRequired, Email
 import opengraph
 from geopy.geocoders import Nominatim
-import summary
+#import summary
 
 
 posts = Blueprint('posts', __name__, template_folder='templates')
